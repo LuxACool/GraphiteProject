@@ -14,13 +14,20 @@ jobs:
       matrix:
         include:
           - platform: "macos-latest"
+            target: "aarch64-apple-darwin"
             args: "--target aarch64-apple-darwin"
           - platform: "macos-latest"
+            target: "x86_64-apple-darwin"
             args: "--target x86_64-apple-darwin"
           - platform: "ubuntu-22.04"
+            target: ""
             args: ""
           - platform: "windows-latest"
+            target: ""
             args: ""
+          - platform: "ubuntu-22.04"
+            target: "aarch64-linux-android"
+            args: "--target aarch64-linux-android"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -34,13 +41,24 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.args != '' && matrix.args || '' }}
+          targets: ${{ matrix.target }}
 
-      - name: install dependencies (Linux only)
-        if: matrix.platform == 'ubuntu-22.04'
+      - name: install dependencies (Linux Desktop only)
+        if: matrix.platform == 'ubuntu-22.04' && matrix.target == ''
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+        
+      - name: setup Android OpenJDK & SDK (Android only)
+        if: matrix.target == 'aarch64-linux-android'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: setup Android SDK (Android only)
+        if: matrix.target == 'aarch64-linux-android'
+        uses: android-actions/setup-android@v3
 
       - name: install frontend dependencies
         run: npm install
