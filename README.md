@@ -2,7 +2,7 @@
 
 What is Graphite?
 
-Graphite is a multi-platform application designed to be lightweight, fast, and accessible across almost every major operating system. Whether you are using a smartphone, a desktop computer, or a specific flavor of Linux, the app is engineered to run natively on your machine without draining your system resources.
+Graphite is a multi-platform study application designed to be lightweight, fast, and accessible across almost every major operating system. Whether you are using a smartphone, a desktop computer, or a specific flavor of Linux, the app is engineered to run natively on your machine without draining your system resources.
 
 The project focuses on a clean user experience, quick deployment, and broad compatibility, allowing users to interact with the same core application interface regardless of the device they happen to have in front of them.
 Supported Platforms and File Formats
