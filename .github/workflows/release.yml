@@ -19,12 +19,13 @@ jobs:
           - platform: "macos-latest"
             target: "x86_64-apple-darwin"
             args: "--target x86_64-apple-darwin"
-          - platform: "ubuntu-22.04"
-            target: ""
-            args: ""
           - platform: "windows-latest"
             target: ""
             args: ""
+          # Linux configuration: Builds standard AppImage/DEB + RPM bundles together
+          - platform: "ubuntu-22.04"
+            target: ""
+            args: "--bundles appimage,deb,rpm"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -40,31 +41,13 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      # Added rpm tool dependency so the Ubuntu runner can package the .rpm format
       - name: install dependencies (Linux Desktop only)
         if: matrix.platform == 'ubuntu-22.04' && matrix.target == ''
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev rpm
         
-      - name: setup Android OpenJDK (Android only)
-        if: matrix.target == 'aarch64-linux-android'
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: setup Android SDK (Android only)
-        if: matrix.target == 'aarch64-linux-android'
-        uses: android-actions/setup-android@v3
-
-      # This action physically installs the missing NDK compiler libraries
-      - name: setup Android NDK (Android only)
-        if: matrix.target == 'aarch64-linux-android'
-        id: setup-ndk
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r26b
-
       - name: install frontend dependencies
         run: npm install
 
@@ -72,9 +55,6 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-          CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android31-clang
         with:
           tagName: graphite-${{ github.ref_name }}
           releaseName: "Graphite v${{ github.ref_name }}"

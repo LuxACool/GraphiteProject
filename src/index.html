@@ -653,6 +653,241 @@ document.addEventListener('keydown', (e) => {
             margin-left: auto; flex-shrink: 0;
         }
 
+        /* ══ MOBILE HEADER ══════════════════════════════════════════════ */
+        #mobile-header {
+            display: none;
+            position: sticky; top: 0; z-index: 80;
+            height: 54px;
+            padding: 0 14px;
+            align-items: center; justify-content: space-between; gap: 10px;
+            background: rgb(var(--bg-sidebar));
+            border-bottom: 1px solid rgb(var(--border-color));
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            flex-shrink: 0;
+        }
+        @media (max-width: 767px) {
+            #mobile-header { display: flex; }
+        }
+        #mobile-header-title {
+            font-size: 15px; font-weight: 700;
+            color: rgb(var(--text-main));
+            flex: 1; text-align: center; letter-spacing: -0.01em;
+        }
+        .mob-icon-btn {
+            width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: transparent; border: none; cursor: pointer;
+            color: rgb(var(--text-muted)); transition: background .15s, color .15s;
+            flex-shrink: 0;
+        }
+        .mob-icon-btn:hover, .mob-icon-btn:active {
+            background: rgba(var(--text-muted), 0.12);
+            color: rgb(var(--text-main));
+        }
+        .mob-icon-btn svg { width: 20px; height: 20px; }
+
+        /* ══ MOBILE LAYOUT IMPROVEMENTS ════════════════════════════════ */
+        @media (max-width: 767px) {
+            /* Prevent double search/capture bar on dashboard */
+            #dash-action-row { display: none !important; }
+
+            /* Tighter dashboard padding */
+            #app-dashboard { padding: 14px 14px 100px !important; }
+
+            /* Greeting text sizing */
+            #dash-greeting { font-size: 1.6rem !important; }
+
+            /* Stat cards: always 2-col, min tap target */
+            #digest-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+            #digest-grid > div { padding: 14px !important; border-radius: 16px !important; min-height: 90px; }
+            #digest-grid .text-3xl { font-size: 2rem !important; }
+
+            /* Streak card inner grid: stack on very small screens */
+            #streak-week-dots { gap: 4px !important; }
+
+            /* Sidebar always fixed+full-height, never in flow */
+            #main-sidebar { position: fixed !important; }
+
+            /* Ensure main content fills full width when sidebar is hidden */
+            main { width: 100% !important; }
+
+            /* Toast closer to bottom edge */
+            #toast-container { bottom: 24px !important; right: 12px !important; }
+
+            /* Mini timer position */
+            #mini-timer { top: 60px !important; right: 10px !important; }
+
+            /* ── NOTES: editor fills full height, list is a fixed overlay ── */
+            #app-notes {
+                flex-direction: column !important;
+                overflow: hidden !important;
+            }
+            /* Hide the sidebar from normal flow entirely on mobile */
+            #notes-list-panel {
+                position: fixed !important;
+                top: 96px !important; /* mobile header (52px) + browse bar (~44px) */
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                max-height: 0 !important;
+                overflow: hidden !important;
+                border: none !important;
+                border-bottom: 1px solid rgb(var(--border-color)) !important;
+                z-index: 200 !important;
+                flex-shrink: 0 !important;
+                transition: max-height 0.28s ease !important;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+            }
+            #notes-list-panel.mob-list-open {
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+            }
+            #note-list {
+                max-height: calc(60vh - 110px) !important;
+                overflow-y: auto !important;
+            }
+            /* Editor fills all the space */
+            #app-notes > div:last-of-type {
+                flex: 1 !important;
+                min-height: 0 !important;
+                overflow: hidden !important;
+                width: 100% !important;
+            }
+
+            /* Toolbar: collapse to single row, hide timestamp, compress buttons */
+            #editor-active > div:first-child {
+                padding: 6px 10px !important;
+                gap: 6px !important;
+            }
+            /* Hide secondary info (timestamp) in toolbar on mobile */
+            #note-timestamp { display: none !important; }
+            #note-wordcount { display: none !important; }
+
+            /* Markdown toolbar: hide H2/H3, table, rule — keep essentials */
+            /* We hide the excess via the toolbar's inner div overflow */
+            #editor-tab-write > div.flex.flex-wrap.items-center {
+                overflow-x: auto !important;
+                flex-wrap: nowrap !important;
+                scrollbar-width: none !important;
+                -webkit-overflow-scrolling: touch !important;
+                gap: 2px !important;
+                padding: 6px 8px !important;
+            }
+            #editor-tab-write > div.flex.flex-wrap.items-center::-webkit-scrollbar { display: none; }
+
+            /* Textarea fills all remaining space comfortably */
+            #note-body-raw {
+                font-size: 15px !important;
+                padding: 14px !important;
+                line-height: 1.7 !important;
+            }
+            #note-title {
+                font-size: 1.2rem !important;
+                padding: 12px 14px 6px !important;
+            }
+            #note-tags { padding: 0 14px 10px !important; }
+
+            /* ── AI TUTOR: clean up header, grow chat, fix input ── */
+            #app-tutor {
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+            #app-tutor > div {
+                padding: 12px 14px 0 !important;
+                max-width: 100% !important;
+                gap: 0 !important;
+            }
+            /* Compact header row */
+            #app-tutor h2 { font-size: 1.1rem !important; margin: 0 !important; }
+            #app-tutor > div > div:first-child { margin-bottom: 10px !important; }
+            /* Tutor header: stack title and controls */
+            #app-tutor > div > div:first-child {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+            }
+            #app-tutor > div > div:first-child > div:last-child {
+                width: 100% !important;
+                justify-content: space-between !important;
+            }
+            /* Chat thread fills the space */
+            #tutor-thread {
+                flex: 1 !important;
+                margin: 0 0 0 !important;
+                border-radius: 0 !important;
+                border-left: none !important;
+                border-right: none !important;
+                padding: 12px !important;
+                min-height: 0 !important;
+            }
+            /* Input row */
+            #app-tutor > div > div.mt-3.flex {
+                padding: 10px 14px !important;
+                margin: 0 !important;
+                background: rgb(var(--bg-sidebar));
+                border-top: 1px solid rgb(var(--border-color));
+                gap: 8px !important;
+            }
+            #tutor-input {
+                font-size: 15px !important;
+                padding: 10px 12px !important;
+                border-radius: 12px !important;
+            }
+            #app-tutor > div > div.mt-3.flex button {
+                padding: 0 18px !important;
+                border-radius: 12px !important;
+                font-size: 15px !important;
+            }
+            /* Card generator panel: collapse by default, hide on mobile unless opened */
+            #app-tutor > div > div.mt-3.glass-sidebar {
+                margin: 0 !important;
+                border-radius: 0 !important;
+                border-left: none !important;
+                border-right: none !important;
+                border-bottom: none !important;
+                padding: 10px 14px !important;
+            }
+            /* Generator panel grid: single column */
+
+            /* ── WHITEBOARD: compact floating toolbar ── */
+            #app-canvas > div:first-of-type {
+                top: 8px !important;
+                left: 8px !important;
+                right: 8px !important;
+                max-width: calc(100vw - 16px) !important;
+                border-radius: 12px !important;
+                padding: 6px 8px !important;
+                gap: 2px !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+            }
+            #app-canvas > div:first-of-type::-webkit-scrollbar { display: none; }
+
+            /* Hide hotkey badges on mobile — pointless on touch */
+            .hotkey-badge { display: none !important; }
+
+            /* Slimmer canvas tool buttons */
+            .canvas-btn {
+                padding: 6px 8px !important;
+                font-size: 11px !important;
+                white-space: nowrap !important;
+            }
+
+            /* Hide color label text, just show swatch + presets */
+            #app-canvas label[title="Stroke color"] > label:first-of-type,
+            #app-canvas > div > div > label.text-\\[10px\\] { display: none !important; }
+
+            /* Eraser size slider: hide on mobile, just let tap set default */
+            #eraser-size-wrap { display: none !important; }
+
+            /* Color presets: slightly bigger tap targets */
+            #app-canvas .w-3\\.5.h-3\\.5.rounded-full {
+                width: 18px !important;
+                height: 18px !important;
+            }
+        }
     </style>
 
     <script>
@@ -718,10 +953,7 @@ document.addEventListener('keydown', (e) => {
         25:00
     </div>
 
-    <!-- Mobile Floating Action Button -->
-    <button onclick="openGlobalCapture()" class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-accent text-white rounded-full shadow-[0_4px_20px_rgba(139,92,246,0.5)] flex items-center justify-center text-3xl z-[90] hover:scale-105 transition-transform pb-1">
-        +
-    </button>
+
 
     <!-- Mobile Backdrop Overlay -->
     <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden md:hidden transition-opacity" onclick="toggleSidebar()"></div>
@@ -799,10 +1031,33 @@ document.addEventListener('keydown', (e) => {
 
     <!-- Main Area -->
     <main class="flex-1 flex flex-col min-w-0 relative glass-bg w-full">
-        
+
         <!-- Hidden breadcrumb elements (used by JS but not displayed) -->
         <span id="breadcrumb-ws" class="hidden">Workspace</span>
         <span id="breadcrumb-current" class="hidden">Dashboard</span>
+
+        <!-- Mobile-only sticky header with hamburger menu -->
+        <header id="mobile-header" aria-label="Mobile navigation">
+            <!-- Hamburger -->
+            <button class="mob-icon-btn" onclick="toggleSidebar()" aria-label="Open menu">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+
+            <!-- App title (updated by switchApp via breadcrumb) -->
+            <div id="mobile-header-title">Graphite</div>
+
+            <!-- Right actions: search + capture -->
+            <div style="display:flex;gap:6px;align-items:center;">
+                <button class="mob-icon-btn" onclick="openHeaderSearch()" aria-label="Search">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                </button>
+
+            </div>
+        </header>
 
         <div class="flex-1 overflow-hidden relative">
             
@@ -816,7 +1071,7 @@ document.addEventListener('keydown', (e) => {
                             <h1 class="text-2xl md:text-3xl font-bold text-textMain" id="dash-greeting">Good morning.</h1>
                             <p class="text-sm text-textMuted mt-0.5" id="dash-subtext">Here's your study overview.</p>
                         </div>
-                        <div class="flex gap-2 shrink-0">
+                        <div class="flex gap-2 shrink-0" id="dash-action-row">
                             <button onclick="openHeaderSearch()" class="flex items-center gap-2 px-4 py-2 glass-sidebar border border-borderDark rounded-xl text-sm text-textMuted hover:text-textMain hover:border-accent/50 transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                 Search
@@ -1085,7 +1340,7 @@ document.addEventListener('keydown', (e) => {
             </section>
 
             <!-- NOTES WORKSPACE -->
-            <section id="app-notes" class="app-module hidden flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden relative">
+            <section id="app-notes" class="app-module hidden flex-col md:flex-row h-full overflow-hidden relative">
                 
                 <!-- Autocomplete Dropdown -->
                 <div id="editor-autocomplete" class="hidden absolute glass-sidebar border border-borderDark rounded-lg shadow-2xl z-50 text-sm py-1 max-h-48 overflow-y-auto min-w-[200px]"></div>
@@ -1095,7 +1350,7 @@ document.addEventListener('keydown', (e) => {
                 </div>
 
                 <!-- Notes Inner Sidebar -->
-                <div class="w-full md:w-64 h-64 md:h-full border-b md:border-b-0 md:border-r border-borderDark glass-sidebar flex flex-col shrink-0">
+                <div class="w-full md:w-64 md:h-full border-b md:border-b-0 md:border-r border-borderDark glass-sidebar flex flex-col shrink-0" id="notes-list-panel">
                     <div class="p-3 border-b border-borderDark flex flex-col gap-2">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-textMain">Notes</span>
@@ -1117,7 +1372,19 @@ document.addEventListener('keydown', (e) => {
                 </div>
                 
                 <!-- Editor -->
-                <div class="flex-1 flex flex-col relative glass-bg min-h-[500px] md:min-h-0">
+                <div class="flex-1 flex flex-col relative glass-bg min-h-0">
+                    <!-- Mobile-only: always-visible notes browse bar -->
+                    <button id="mob-notes-bar" onclick="toggleMobileNotesList()" class="md:hidden w-full flex items-center justify-between px-4 py-2.5 border-b border-borderDark glass-sidebar shrink-0" style="cursor:pointer;z-index:10;position:relative;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:16px;">📋</span>
+                            <span style="font-size:13px;font-weight:600;color:rgb(var(--text-main));">My Notes</span>
+                            <span id="mob-notes-bar-count" style="font-size:11px;color:rgb(var(--accent));background:rgba(var(--accent),0.12);border:1px solid rgba(var(--accent),0.2);border-radius:20px;padding:1px 8px;font-weight:700;"></span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;color:rgb(var(--text-muted));font-size:12px;">
+                            <span>Tap to browse</span>
+                            <span id="mob-notes-bar-chevron" style="font-size:10px;display:inline-block;transition:transform 0.25s;">▼</span>
+                        </div>
+                    </button>
                     <div id="editor-empty" class="absolute inset-0 flex items-center justify-center text-textMuted text-sm">
                         Select or create a note.
                     </div>
@@ -1459,6 +1726,7 @@ document.addEventListener('keydown', (e) => {
                         <div id="mc-result-breakdown" class="text-left space-y-2 mb-5 max-h-64 overflow-y-auto"></div>
                         <button onclick="startMCSession()" class="px-6 py-2.5 bg-accent text-white font-bold rounded-xl text-sm hover:opacity-90 transition">Try Again ✦</button>
                     </div>
+
                 </div>
             </section>
 
@@ -1614,85 +1882,10 @@ document.addEventListener('keydown', (e) => {
                 </div>
                 <div id="tutor-thread" class="flex-1 overflow-y-auto flex flex-col gap-3 p-4 glass-sidebar border border-borderDark rounded-xl"></div>
                 <div class="mt-3 flex gap-2">
-                  <textarea id="tutor-input" rows="2" placeholder="Ask about your notes, a concept, or paste a problem... or ask me to generate flashcards/MCQs from your notes!" class="flex-1 bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent resize-none"></textarea>
+                  <textarea id="tutor-input" rows="2" placeholder="Ask about your notes, a concept, or paste a problem..." class="flex-1 bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent resize-none"></textarea>
                   <button onclick="tutorSend()" class="px-5 bg-accent text-white font-bold rounded-lg hover:opacity-90 transition self-stretch">Send</button>
                 </div>
 
-                <!-- AI Card Generator Panel -->
-                <div class="mt-3 glass-sidebar border border-borderDark rounded-xl p-4">
-                  <div class="flex items-center justify-between mb-3">
-                    <div>
-                      <span class="text-xs font-bold text-textMain">✦ Generate Cards from Notes</span>
-                      <p class="text-[10px] text-textMuted mt-0.5">AI reads your notes and creates a ready-to-study card set.</p>
-                    </div>
-                    <button onclick="toggleTutorCardGen()" id="tutor-cardgen-toggle" class="text-[10px] text-accent hover:underline">Show ▼</button>
-                  </div>
-                  <div id="tutor-cardgen-panel" class="hidden space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <div>
-                        <label class="text-[10px] text-textMuted uppercase tracking-wider block mb-1">Card Type</label>
-                        <div class="csel w-full" onclick="event.stopPropagation()">
-                            <select id="cg-type" class="hidden">
-                                <option value="flashcard">Flashcards (Q&A)</option>
-                                <option value="mcq">Multiple Choice</option>
-                                <option value="both">Both</option>
-                            </select>
-                            <button id="cg-type-btn" class="csel-btn sm w-full" onclick="cselToggle('cg-type',event)">
-                                <span class="csel-label">Flashcards (Q&A)</span>
-                                <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
-                            </button>
-                            <div id="cg-type-dd" class="csel-dropdown">
-                                <div class="csel-option selected" data-val="flashcard" onclick="cselChoose('cg-type','flashcard','Flashcards (Q&A)')">Flashcards (Q&A)</div>
-                                <div class="csel-option" data-val="mcq"      onclick="cselChoose('cg-type','mcq','Multiple Choice')">Multiple Choice</div>
-                                <div class="csel-option" data-val="both"     onclick="cselChoose('cg-type','both','Both')">Both</div>
-                            </div>
-                        </div>
-                      </div>
-                      <div>
-                        <label class="text-[10px] text-textMuted uppercase tracking-wider block mb-1">Source Notes</label>
-                        <div class="csel w-full" onclick="event.stopPropagation()">
-                            <select id="cg-source" class="hidden">
-                                <option value="all">All notes</option>
-                                <option value="current">Current note only</option>
-                            </select>
-                            <button id="cg-source-btn" class="csel-btn sm w-full" onclick="cselToggle('cg-source',event)">
-                                <span class="csel-label">All notes</span>
-                                <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
-                            </button>
-                            <div id="cg-source-dd" class="csel-dropdown">
-                                <div class="csel-option selected" data-val="all"     onclick="cselChoose('cg-source','all','All notes')">All notes</div>
-                                <div class="csel-option"          data-val="current" onclick="cselChoose('cg-source','current','Current note only')">Current note only</div>
-                            </div>
-                        </div>
-                      </div>
-                      <div>
-                        <label class="text-[10px] text-textMuted uppercase tracking-wider block mb-1">How Many</label>
-                        <div class="csel w-full" onclick="event.stopPropagation()">
-                            <select id="cg-count" class="hidden">
-                                <option value="5">5 cards</option>
-                                <option value="10" selected>10 cards</option>
-                                <option value="15">15 cards</option>
-                                <option value="20">20 cards</option>
-                            </select>
-                            <button id="cg-count-btn" class="csel-btn sm w-full" onclick="cselToggle('cg-count',event)">
-                                <span class="csel-label">10 cards</span>
-                                <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
-                            </button>
-                            <div id="cg-count-dd" class="csel-dropdown">
-                                <div class="csel-option"          data-val="5"  onclick="cselChoose('cg-count','5','5 cards')">5 cards</div>
-                                <div class="csel-option selected" data-val="10" onclick="cselChoose('cg-count','10','10 cards')">10 cards</div>
-                                <div class="csel-option"          data-val="15" onclick="cselChoose('cg-count','15','15 cards')">15 cards</div>
-                                <div class="csel-option"          data-val="20" onclick="cselChoose('cg-count','20','20 cards')">20 cards</div>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                    <button onclick="tutorGenerateCards()" id="cg-gen-btn" class="w-full py-2 bg-accent text-white text-xs font-bold rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2">
-                      <span id="cg-gen-icon">✦</span> Generate
-                    </button>
-                    <div id="cg-result" class="hidden text-xs text-mint font-semibold text-center py-1"></div>
-                  </div>
-                </div>
 
                 <p class="text-[10px] text-textMuted mt-2">Powered by Pollinations.ai (free, no key). Responses can be wrong — verify against sources.</p>
               </div>
@@ -1799,6 +1992,7 @@ document.addEventListener('keydown', (e) => {
                             <button data-settings-tab="ai" class="settings-tab-btn text-left px-3 py-2 rounded-lg text-sm text-textMain hover:bg-black/20 transition whitespace-nowrap flex items-center gap-2"><span>✦</span><span>AI Tutor</span></button>
                             <button data-settings-tab="data" class="settings-tab-btn text-left px-3 py-2 rounded-lg text-sm text-textMain hover:bg-black/20 transition whitespace-nowrap flex items-center gap-2"><span>•</span><span>Data</span></button>
                             <button data-settings-tab="shortcuts" class="settings-tab-btn text-left px-3 py-2 rounded-lg text-sm text-textMain hover:bg-black/20 transition whitespace-nowrap flex items-center gap-2"><span>•</span><span>Shortcuts</span></button>
+                            <button data-settings-tab="about" class="settings-tab-btn text-left px-3 py-2 rounded-lg text-sm text-textMain hover:bg-black/20 transition whitespace-nowrap flex items-center gap-2"><span>♡</span><span>About</span></button>
                         </nav>
 
                         <!-- Panels -->
@@ -1971,7 +2165,7 @@ document.addEventListener('keydown', (e) => {
                                     <label class="text-xs text-textMuted block mb-1 mt-2">AI Provider</label>
                                     <div class="csel w-full mb-3" onclick="event.stopPropagation()">
                                         <select id="setting-ai-provider" class="hidden" onchange="updateAiProvider(this.value)">
-                                            <option value="free">🆓 Free (Pollinations.ai — no key needed)</option>
+                                            <option value="free">Free (Pollinations.ai — no key needed)</option>
                                             <option value="openai">🤖 OpenAI (ChatGPT — gpt-4o-mini)</option>
                                             <option value="claude">🟣 Anthropic (Claude — claude-haiku-4-5-20251001)</option>
                                             <option value="gemini">🔵 Google (Gemini — gemini-1.5-flash)</option>
@@ -2006,8 +2200,8 @@ document.addEventListener('keydown', (e) => {
                                     <p class="text-xs text-textMuted mb-4">Export your vault, or sync markdown files directly to your hard drive.</p>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                         <button onclick="exportVault()" class="px-4 py-2.5 bg-accent/20 text-accent font-semibold border border-accent/30 rounded-lg hover:bg-accent/30 transition text-sm text-center shadow-sm">Export Vault (.json)</button>
-                                        <button onclick="syncToFolder()" class="px-4 py-2.5 bg-mint/20 text-mint font-semibold border border-mint/30 rounded-lg hover:bg-mint/30 transition text-sm text-center shadow-sm">📁 Sync Notes to Folder</button>
-                                        <button onclick="document.getElementById('import-vault').click()" class="px-4 py-2.5 bg-bgDark text-textMain border border-borderDark rounded-lg hover:bg-black/20 transition text-sm text-center shadow-sm">📤 Import Vault</button>
+                                        <button onclick="syncToFolder()" class="px-4 py-2.5 bg-mint/20 text-mint font-semibold border border-mint/30 rounded-lg hover:bg-mint/30 transition text-sm text-center shadow-sm">Sync Notes to Folder</button>
+                                        <button onclick="document.getElementById('import-vault').click()" class="px-4 py-2.5 bg-bgDark text-textMain border border-borderDark rounded-lg hover:bg-black/20 transition text-sm text-center shadow-sm">Import Vault</button>
                                         <input type="file" id="import-vault" accept=".json" class="hidden" onchange="importVault(event)">
                                     </div>
                                 </div>
@@ -2051,6 +2245,26 @@ document.addEventListener('keydown', (e) => {
                                         <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Sticky Note</span><kbd class="text-accent font-mono">7</kbd></div>
                                         <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Eraser</span><kbd class="text-accent font-mono">8</kbd></div>
                                         <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Fill</span><kbd class="text-accent font-mono">9</kbd></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-settings-panel="about" class="settings-panel hidden space-y-5">
+                                <div class="glass-sidebar border border-borderDark rounded-xl p-8 shadow-sm flex flex-col items-center text-center gap-4">
+                                    <div>
+                                        <h2 class="text-xl font-bold text-textMain mb-1">Graphite</h2>
+                                        <p class="text-xs text-textMuted">pretty cool study app</p>
+                                    </div>
+                                    <div class="w-12 border-t border-borderDark"></div>
+                                    <div class="space-y-1">
+                                        <p class="text-xs text-textMuted uppercase tracking-widest font-semibold">Designed &amp; Built by</p>
+                                        <p class="text-base font-semibold text-textMain">Dzaki Ma'arif</p>
+                                        <a href="https://instagram.com/tofyouu_" target="_blank" rel="noopener noreferrer"
+                                           class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border border-borderDark hover:border-accent hover:text-accent transition-colors"
+                                           style="color: rgb(var(--text-muted)); text-decoration: none; margin-top: 4px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                                            @tofyouu_
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -2182,6 +2396,81 @@ document.addEventListener('keydown', (e) => {
             <div class="flex justify-end gap-3 shrink-0 pt-2 border-t border-borderDark/50">
                 <button id="modal-cancel" class="px-5 py-2.5 rounded-lg text-sm font-medium text-textMuted hover:text-textMain hover:bg-black/20 transition">Cancel</button>
                 <button id="modal-confirm" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-accent text-white hover:bg-accent/80 transition shadow-sm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Card Modal (Manual + AI Generate tabs) -->
+    <div id="add-card-modal" class="fixed inset-0 z-[9960] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-8">
+        <div class="glass-sidebar border border-borderDark rounded-xl shadow-2xl w-full max-w-md p-6 flex flex-col max-h-full">
+            <div class="flex items-center justify-between mb-4 shrink-0">
+                <h3 class="text-lg font-bold text-textMain">Add Card</h3>
+                <button onclick="closeAddCardModal()" class="text-textMuted hover:text-textMain text-xl leading-none">&times;</button>
+            </div>
+            <!-- Tab switcher -->
+            <div class="flex p-0.5 glass-bg border border-borderDark rounded-lg mb-5 shrink-0">
+                <button id="act-tab-manual" onclick="switchAddCardTab('manual')" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition bg-accent text-white">✏️ Manual</button>
+                <button id="act-tab-ai" onclick="switchAddCardTab('ai')" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition text-textMuted">✦ AI Generate</button>
+            </div>
+
+            <!-- Manual tab -->
+            <div id="act-panel-manual" class="flex flex-col gap-4 overflow-y-auto">
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted mb-1">Card Type</label>
+                    <select id="act-type" class="w-full bg-black/20 border border-borderDark rounded-lg px-3 py-2.5 text-textMain outline-none focus:border-accent text-sm transition">
+                        <option value="basic">Basic Flashcard</option>
+                        <option value="mcq">Multiple Choice</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted mb-1">Question / Front</label>
+                    <input id="act-q" type="text" class="w-full bg-black/20 border border-borderDark rounded-lg px-3 py-2.5 text-textMain outline-none focus:border-accent text-sm transition" placeholder="e.g. What is photosynthesis?">
+                </div>
+                <div id="act-options-wrap">
+                    <label class="block text-xs font-semibold text-textMuted mb-1">Options <span class="text-textMuted/50 font-normal">(MCQ — comma separated)</span></label>
+                    <input id="act-options" type="text" class="w-full bg-black/20 border border-borderDark rounded-lg px-3 py-2.5 text-textMain outline-none focus:border-accent text-sm transition" placeholder="Option A, Option B, Option C">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted mb-1">Answer / Back</label>
+                    <input id="act-a" type="text" class="w-full bg-black/20 border border-borderDark rounded-lg px-3 py-2.5 text-textMain outline-none focus:border-accent text-sm transition" placeholder="e.g. The process plants use to make food from sunlight">
+                </div>
+                <div class="flex justify-end gap-3 pt-2 border-t border-borderDark/50 shrink-0">
+                    <button onclick="closeAddCardModal()" class="px-5 py-2 rounded-lg text-sm font-medium text-textMuted hover:text-textMain hover:bg-black/20 transition">Cancel</button>
+                    <button onclick="submitManualCard()" class="px-5 py-2 rounded-lg text-sm font-bold bg-accent text-white hover:opacity-90 transition">Add Card</button>
+                </div>
+            </div>
+
+            <!-- AI Generate tab -->
+            <div id="act-panel-ai" class="hidden flex flex-col gap-4 overflow-y-auto">
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted mb-1">Card Type</label>
+                    <select id="act-ai-type" class="w-full bg-black/20 border border-borderDark rounded-lg px-3 py-2.5 text-textMain outline-none focus:border-accent text-sm transition">
+                        <option value="flashcard">Flashcards (Q&A)</option>
+                        <option value="mcq">Multiple Choice</option>
+                        <option value="both">Both</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted mb-1">Source Notes</label>
+                    <select id="act-ai-source" class="w-full bg-black/20 border border-borderDark rounded-lg px-3 py-2.5 text-textMain outline-none focus:border-accent text-sm transition">
+                        <option value="all">All notes</option>
+                        <option value="current">Current note only</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted mb-1">How Many</label>
+                    <select id="act-ai-count" class="w-full bg-black/20 border border-borderDark rounded-lg px-3 py-2.5 text-textMain outline-none focus:border-accent text-sm transition">
+                        <option value="5">5 cards</option>
+                        <option value="10" selected>10 cards</option>
+                        <option value="15">15 cards</option>
+                        <option value="20">20 cards</option>
+                    </select>
+                </div>
+                <div id="act-ai-result" class="hidden text-xs text-mint font-semibold text-center py-1"></div>
+                <div class="flex justify-end gap-3 pt-2 border-t border-borderDark/50 shrink-0">
+                    <button onclick="closeAddCardModal()" class="px-5 py-2 rounded-lg text-sm font-medium text-textMuted hover:text-textMain hover:bg-black/20 transition">Cancel</button>
+                    <button onclick="submitAIGenerate()" id="act-ai-btn" class="px-5 py-2 rounded-lg text-sm font-bold bg-accent text-white hover:opacity-90 transition flex items-center gap-2"><span id="act-ai-icon">✦</span> Generate</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2387,7 +2676,7 @@ document.addEventListener('keydown', (e) => {
             state.activityHistory[date][type]++; saveDataToDB();
         }
 
-        /* =========================================
+        /* ═══════════════════════════════════════════════════════
            MOBILE SIDEBAR MANAGEMENT
            ========================================= */
         function toggleSidebar() {
@@ -2402,6 +2691,38 @@ document.addEventListener('keydown', (e) => {
                 overlay.classList.remove('hidden');
             }
         }
+
+        /* Mobile notes list toggle — opens/closes the overlay panel */
+        function toggleMobileNotesList() {
+            const panel = document.getElementById('notes-list-panel');
+            if (!panel) return;
+            const isOpen = panel.classList.contains('mob-list-open');
+            panel.classList.toggle('mob-list-open', !isOpen);
+            const chevron = document.getElementById('mob-notes-bar-chevron');
+            if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+        }
+        function closeMobileNotesList() {
+            const panel = document.getElementById('notes-list-panel');
+            if (panel) panel.classList.remove('mob-list-open');
+            const chevron = document.getElementById('mob-notes-bar-chevron');
+            if (chevron) chevron.style.transform = '';
+        }
+        /* Keep the count badge in the browse bar in sync */
+        function updateMobNotesBarCount() {
+            const el = document.getElementById('mob-notes-bar-count');
+            if (!el) return;
+            const count = (state.notes || []).filter(n => n.workspaceId === state.activeWorkspace).length;
+            el.textContent = count;
+        }
+        /* Auto-close the notes overlay when a note is tapped on mobile */
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth >= 768) return;
+            const panel = document.getElementById('notes-list-panel');
+            if (!panel || !panel.classList.contains('mob-list-open')) return;
+            if (e.target.closest('.note-item')) {
+                setTimeout(closeMobileNotesList, 120);
+            }
+        });
 
         // Swipe-to-close for mobile sidebar
         (function() {
@@ -3188,6 +3509,11 @@ document.addEventListener('keydown', (e) => {
             
             const labels = { dashboard: 'Dashboard', pomodoro: 'Focus', calendar: 'Calendar', notes: 'Notes', graph: 'Graph', flashcards: 'Spaced Repetition', kanban: 'Tasks', canvas: 'Whiteboard', settings: 'Settings', cognitive: 'Cognitive Lab', sessions: 'Session Log', search: 'Search'};
             document.getElementById('breadcrumb-current').innerText = labels[appId] || 'Workspace';
+            const mobTitle = document.getElementById('mobile-header-title');
+            if (mobTitle) {
+                mobTitle.textContent = labels[appId] || 'Graphite';
+                if (appId !== 'notes') closeMobileNotesList();
+            }
 
             if(appId === 'dashboard') updateDashboard();
             if(appId === 'canvas') { setTimeout(() => { resizeCanvas(); redrawCanvas(); }, 100); }
@@ -3674,6 +4000,7 @@ document.addEventListener('keydown', (e) => {
         }
 
         function renderNotesList() {
+            updateMobNotesBarCount();
             const query = (document.getElementById('note-search').value || '').toLowerCase(); const searchAll = document.getElementById('search-all-ws').checked;
             const pool = searchAll ? state.notes : state.notes.filter(n => n.workspaceId === state.activeWorkspace);
             const countEl = document.getElementById('notes-count');
@@ -3708,7 +4035,7 @@ document.addEventListener('keydown', (e) => {
                 </div>
             `}).join('');
         }
-        function filterNotes() { renderNotesList(); }
+        function filterNotes() { renderNotesList(); updateMobNotesBarCount(); }
 
         function loadNoteIntoEditor(id) {
             const note = state.notes.find(n => n.id === id); if(!note) return;
@@ -4046,30 +4373,76 @@ document.addEventListener('keydown', (e) => {
         /* --- FLASHCARDS (3D Flip & Markdown) --- */
         let srsDeck = []; let currentCard = null; let isCardFlipped = false;
         
-        async function addFlashcard() {
-            // Open a richer modal that supports both Basic and MCQ cards
-            const data = await showModal({ title: 'Add Card', type: 'form', fields: [
-                {id:'type', label:'Card Type', type:'select', options:['Basic Flashcard','Multiple Choice']},
-                {id:'q', label:'Question / Front', type:'text'},
-                {id:'options', label:'Options (MCQ only — comma separated)', type:'text'},
-                {id:'a', label:'Answer / Back', type:'text'}
-            ]});
-            if(!data || !data.q || !data.a) return;
-            const isMCQ = data.type === 'Multiple Choice';
-            let newCard = { id: Date.now().toString(), q: data.q, a: data.a, rep: 0, int: 1, ef: 2.5, next: Date.now(), workspaceId: state.activeWorkspace };
-            if (isMCQ && data.options) {
-                const opts = data.options.split(',').map(o => o.trim()).filter(Boolean);
-                if (opts.length >= 2) {
-                    newCard.type = 'mcq';
-                    newCard.options = opts;
-                    // Auto-correct case so answer matches one of the options
-                    const match = opts.find(o => o.toLowerCase() === data.a.toLowerCase());
-                    if (match) newCard.a = match;
-                }
+        function addFlashcard() {
+            const modal = document.getElementById('add-card-modal');
+            if (!modal) return;
+            // Reset fields
+            document.getElementById('act-q').value = '';
+            document.getElementById('act-a').value = '';
+            document.getElementById('act-options').value = '';
+            document.getElementById('act-type').value = 'basic';
+            document.getElementById('act-options-wrap').style.display = 'none';
+            document.getElementById('act-ai-result').classList.add('hidden');
+            switchAddCardTab('manual');
+            modal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('act-q').focus(), 80);
+        }
+        function closeAddCardModal() {
+            document.getElementById('add-card-modal').classList.add('hidden');
+        }
+        function switchAddCardTab(tab) {
+            document.getElementById('act-panel-manual').classList.toggle('hidden', tab !== 'manual');
+            document.getElementById('act-panel-ai').classList.toggle('hidden', tab !== 'ai');
+            document.getElementById('act-tab-manual').className = 'flex-1 py-1.5 text-xs font-semibold rounded-md transition ' + (tab === 'manual' ? 'bg-accent text-white' : 'text-textMuted');
+            document.getElementById('act-tab-ai').className = 'flex-1 py-1.5 text-xs font-semibold rounded-md transition ' + (tab === 'ai' ? 'bg-accent text-white' : 'text-textMuted');
+        }
+        function submitManualCard() {
+            const q = document.getElementById('act-q').value.trim();
+            const a = document.getElementById('act-a').value.trim();
+            if (!q || !a) { toast('Please fill in the question and answer.', 'error'); return; }
+            const isMCQ = document.getElementById('act-type').value === 'mcq';
+            let card = { id: Date.now().toString(), q, a, rep: 0, int: 1, ef: 2.5, next: Date.now(), workspaceId: state.activeWorkspace };
+            if (isMCQ) {
+                const opts = document.getElementById('act-options').value.split(',').map(o => o.trim()).filter(Boolean);
+                if (opts.length >= 2) { card.type = 'mcq'; card.options = opts; const match = opts.find(o => o.toLowerCase() === a.toLowerCase()); if (match) card.a = match; }
             }
-            state.flashcards.push(newCard);
+            state.flashcards.push(card);
             saveDataToDB(); updateFlashcardUI();
-            toast('Card added!');
+            closeAddCardModal();
+            toast('Card added!', 'success');
+        }
+        // Show/hide MCQ options field based on type selection
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'act-type') {
+                document.getElementById('act-options-wrap').style.display = e.target.value === 'mcq' ? 'block' : 'none';
+            }
+        });
+        async function submitAIGenerate() {
+            const type = document.getElementById('act-ai-type').value;
+            const source = document.getElementById('act-ai-source').value;
+            const count = parseInt(document.getElementById('act-ai-count').value) || 10;
+            const btn = document.getElementById('act-ai-btn');
+            const icon = document.getElementById('act-ai-icon');
+            const resultEl = document.getElementById('act-ai-result');
+            // Reuse tutorGenerateCards logic by temporarily syncing the cg-* selects if present
+            const cgType = document.getElementById('cg-type');
+            const cgSource = document.getElementById('cg-source');
+            const cgCount = document.getElementById('cg-count');
+            if (cgType) cgType.value = type;
+            if (cgSource) cgSource.value = source;
+            if (cgCount) cgCount.value = count;
+            btn.disabled = true; icon.textContent = '⏳';
+            resultEl.classList.add('hidden');
+            try {
+                await tutorGenerateCards();
+                resultEl.textContent = '✓ Cards generated and added to your deck!';
+                resultEl.classList.remove('hidden');
+                setTimeout(closeAddCardModal, 1400);
+            } catch(e) {
+                resultEl.textContent = '✗ Generation failed. Try again.';
+                resultEl.classList.remove('hidden');
+            }
+            btn.disabled = false; icon.textContent = '✦';
         }
 
         let srsBatchLimit = 10; // default 10 questions per session
@@ -5920,15 +6293,6 @@ document.addEventListener('keydown', (e) => {
         function tutorClear(){ state.tutorChat=[]; renderTutorThread(); saveDataToDB(); }
 
         // ── AI CARD GENERATOR (from Tutor panel) ────────────────────────
-        function toggleTutorCardGen() {
-            const panel = document.getElementById('tutor-cardgen-panel');
-            const btn = document.getElementById('tutor-cardgen-toggle');
-            if (!panel || !btn) return;
-            const isHidden = panel.classList.contains('hidden');
-            panel.classList.toggle('hidden');
-            btn.textContent = isHidden ? 'Hide ▲' : 'Show ▼';
-        }
-
         async function tutorGenerateCards() {
             const type = document.getElementById('cg-type').value;
             const source = document.getElementById('cg-source').value;
