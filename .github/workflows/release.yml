@@ -61,11 +61,6 @@ jobs:
         id: setup-android
         uses: android-actions/setup-android@v3
 
-      - name: Expose NDK Toolchain to Path (Android only)
-        if: matrix.target == 'aarch64-linux-android'
-        run: |
-          echo "${{ steps.setup-android.outputs.ANDROID_NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-
       - name: install frontend dependencies
         run: npm install
 
@@ -75,6 +70,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ steps.setup-android.outputs.ANDROID_NDK_HOME }}
           ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ANDROID_NDK_HOME }}
+          # Force Cargo to use the NDK target linker for cross-compilation
+          CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: ${{ steps.setup-android.outputs.ANDROID_NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android36-clang
         with:
           tagName: graphite-${{ github.ref_name }}
           releaseName: "Graphite v${{ github.ref_name }}"
