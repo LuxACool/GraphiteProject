@@ -49,14 +49,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
         
-      - name: setup Android OpenJDK & SDK (Android only)
+      - name: setup Android OpenJDK (Android only)
         if: matrix.target == 'aarch64-linux-android'
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: setup Android SDK (Android only)
+      - name: setup Android SDK & NDK (Android only)
         if: matrix.target == 'aarch64-linux-android'
         uses: android-actions/setup-android@v3
 
@@ -67,6 +67,8 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NDK_HOME: ${{ steps.setup-android.outputs.ANDROID_NDK_HOME }}
+          ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ANDROID_NDK_HOME }}
         with:
           tagName: graphite-${{ github.ref_name }}
           releaseName: "Graphite v${{ github.ref_name }}"
