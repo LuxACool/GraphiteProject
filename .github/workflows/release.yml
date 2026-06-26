@@ -58,6 +58,7 @@ jobs:
 
       - name: setup Android SDK & NDK (Android only)
         if: matrix.target == 'aarch64-linux-android'
+        id: setup-android
         uses: android-actions/setup-android@v3
 
       - name: install frontend dependencies
