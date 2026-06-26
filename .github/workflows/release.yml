@@ -25,9 +25,6 @@ jobs:
           - platform: "windows-latest"
             target: ""
             args: ""
-          - platform: "ubuntu-22.04"
-            target: "aarch64-linux-android"
-            args: "--target aarch64-linux-android"
 
     runs-on: ${{ matrix.platform }}
     steps:
