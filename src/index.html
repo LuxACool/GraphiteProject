@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Graphite</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -68,6 +68,18 @@
         }
 
 document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey) && e.key==='/') { e.preventDefault(); openHeaderSearch(); } });
+
+// Scrollable toolbar fade hint
+document.addEventListener('DOMContentLoaded', () => {
+    const scroll = document.querySelector('.md-toolbar-scroll');
+    const wrap = document.querySelector('.md-toolbar-wrap');
+    if (scroll && wrap) {
+        scroll.addEventListener('scroll', () => {
+            const atEnd = scroll.scrollLeft + scroll.clientWidth >= scroll.scrollWidth - 4;
+            wrap.classList.toggle('scrolled-end', atEnd);
+        }, { passive: true });
+    }
+});
 
 // Flashcard keyboard navigation (Arrow keys + Space when on flashcards tab)
 document.addEventListener('keydown', (e) => {
@@ -185,7 +197,7 @@ document.addEventListener('keydown', (e) => {
        /* -- body.focus-mode aside { filter: blur(5px); opacity: 0.5; } -- */
        /* -- body.focus-mode header { filter: blur(5px); opacity: 0.5; } -- */
         
-        /* Stop touch panning on canvas */
+        /* Canvas: block all native touch gestures so we handle them in JS */
         #whiteboard { touch-action: none; }
         .hotkey-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;font-size:9px;font-weight:700;line-height:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(var(--accent),0.15);color:rgb(var(--accent));border:1px solid rgba(var(--accent),0.3);border-radius:4px;letter-spacing:0;}
         .canvas-btn.tool-active .hotkey-badge{background:rgba(255,255,255,0.18);color:#fff;border-color:rgba(255,255,255,0.35);}
@@ -323,6 +335,79 @@ document.addEventListener('keydown', (e) => {
             --text-main: var(--custom-text-main, 229 229 229);
             --text-muted: var(--custom-text-muted, 139 139 139);
             --accent: var(--custom-accent, 139 92 246);
+        }
+
+        /* ══ KANBAN TOUCH DRAG-AND-DROP ════════════════════════════════ */
+
+        /* Ghost card that follows the finger */
+        .kb-drag-ghost {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99990;
+            opacity: 0.88;
+            transform: scale(1.04) rotate(1.5deg);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 0 2px rgb(var(--accent));
+            border-radius: 10px;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            will-change: transform, left, top;
+        }
+
+        /* Source card dimmed while dragging */
+        .kb-dragging-source {
+            opacity: 0.35;
+            transform: scale(0.97);
+            transition: opacity 0.15s, transform 0.15s;
+        }
+
+        /* Column drop zone highlight */
+        .kb-col-touch-over {
+            outline: 2px solid rgb(var(--accent));
+            outline-offset: -2px;
+            background: rgba(var(--accent), 0.06) !important;
+            transition: background 0.15s, outline 0.15s;
+        }
+
+        /* Drop indicator line — where the card will land */
+        .kb-drop-indicator {
+            height: 3px;
+            border-radius: 2px;
+            background: rgb(var(--accent));
+            margin: 4px 0;
+            box-shadow: 0 0 8px rgba(var(--accent), 0.6);
+            pointer-events: none;
+            flex-shrink: 0;
+        }
+
+        /* Hide the old ↔ mobile move button — touch drag replaces it */
+        @media (max-width: 767px) {
+            .kb-move-btn { display: none !important; }
+        }
+        /* ══ END KANBAN TOUCH DRAG-AND-DROP ════════════════════════════ */
+
+        /* ── Scrollable formatting toolbar (mobile) ────────────────────── */
+        .md-toolbar-scroll::-webkit-scrollbar { display: none; }
+        .md-toolbar-fade {
+            display: none;
+        }
+        @media (max-width: 767px) {
+            .md-toolbar-fade {
+                display: block;
+                position: absolute;
+                right: 0; top: 0; bottom: 0;
+                width: 32px;
+                background: linear-gradient(to right, transparent, rgb(var(--bg-sidebar)));
+                pointer-events: none;
+            }
+            /* Hide fade once user has scrolled to the end */
+            .md-toolbar-wrap.scrolled-end .md-toolbar-fade { display: none; }
+        }
+
+        /* Hide undo/redo and ··· overflow button on mobile in note preview mode */
+        @media (max-width: 767px) {
+            .note-preview-mode #btn-undo,
+            .note-preview-mode #btn-redo,
+            .note-preview-mode #toolbar-divider,
+            .note-preview-mode #note-overflow-wrap { display: none !important; }
         }
 
         /* Soundscape sliders */
@@ -549,6 +634,52 @@ document.addEventListener('keydown', (e) => {
         @keyframes ringAppear { from { stroke-dashoffset: 408; } }
         .pomo-ring-fill { animation: ringAppear 0.6s ease; }
 
+        /* ── POMODORO PRESET BUTTONS: 2×2 grid on mobile ── */
+        @media (max-width: 767px) {
+            /* The preset container: switch to a 2×2 CSS grid */
+            #app-pomodoro > div.flex.gap-1\\.5.mt-4 {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                grid-template-rows: auto auto auto !important;
+                gap: 6px !important;
+                padding: 10px !important;
+                border-radius: 16px !important;
+                width: 100% !important;
+                max-width: 320px !important;
+            }
+            .preset-btn {
+                flex: unset !important;
+                width: 100% !important;
+                min-height: 44px !important;
+                font-size: 13px !important;
+                padding: 10px 8px !important;
+                text-align: center !important;
+                border-radius: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            /* Divider between presets and custom input: span full width */
+            #app-pomodoro > div.flex.gap-1\\.5.mt-4 > .w-px {
+                display: none !important;
+            }
+            /* Custom timer input row: span both columns */
+            #app-pomodoro > div.flex.gap-1\\.5.mt-4 > div:last-child {
+                grid-column: 1 / -1 !important;
+                justify-content: center !important;
+                padding: 4px 0 2px !important;
+            }
+            #app-pomodoro > div.flex.gap-1\\.5.mt-4 > div:last-child input {
+                height: 36px !important;
+                font-size: 14px !important;
+            }
+            #app-pomodoro > div.flex.gap-1\\.5.mt-4 > div:last-child button {
+                height: 36px !important;
+                font-size: 13px !important;
+                padding: 0 14px !important;
+            }
+        }
+
         /* ── READING PROGRESS BAR ── */
         #page-progress { position: fixed; top: 0; left: 0; height: 2px; background: rgb(var(--accent)); z-index: 9999; width: 0%; transition: width 0.1s linear; }
 
@@ -653,18 +784,47 @@ document.addEventListener('keydown', (e) => {
             margin-left: auto; flex-shrink: 0;
         }
 
+        /* ══ NOTES OVERFLOW POPOVER ════════════════════════════════════ */
+        .note-overflow-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgb(var(--text-main));
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.12s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .note-overflow-item:active,
+        .note-overflow-item:hover {
+            background: rgba(var(--text-muted), 0.08);
+        }
+        /* ══ END NOTES OVERFLOW POPOVER ════════════════════════════════ */
+
+        /* ══ SWIPE-UP NAV SHEET — hidden on desktop ══ */
+        #mob-nav-scrim,
+        #mob-nav-sheet { display: none; }
+
         /* ══ MOBILE HEADER ══════════════════════════════════════════════ */
         #mobile-header {
             display: none;
             position: sticky; top: 0; z-index: 80;
-            height: 54px;
-            padding: 0 14px;
+            min-height: 54px;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-left: 14px; padding-right: 14px; padding-bottom: 0;
             align-items: center; justify-content: space-between; gap: 10px;
             background: rgb(var(--bg-sidebar));
             border-bottom: 1px solid rgb(var(--border-color));
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             flex-shrink: 0;
         }
+        #mobile-header > * { margin-bottom: 0; align-self: center; }
         @media (max-width: 767px) {
             #mobile-header { display: flex; }
         }
@@ -706,7 +866,13 @@ document.addEventListener('keydown', (e) => {
             #streak-week-dots { gap: 4px !important; }
 
             /* Sidebar always fixed+full-height, never in flow */
-            #main-sidebar { position: fixed !important; }
+            #main-sidebar { position: fixed !important; display: none !important; }
+
+            /* Also hide the mobile overlay that backed the old sidebar */
+            #mobile-overlay { display: none !important; }
+
+            /* Hide hamburger — swipe sheet handles navigation now */
+            #mobile-header button[onclick="toggleSidebar()"] { display: none !important; }
 
             /* Ensure main content fills full width when sidebar is hidden */
             main { width: 100% !important; }
@@ -714,37 +880,231 @@ document.addEventListener('keydown', (e) => {
             /* Toast closer to bottom edge */
             #toast-container { bottom: 24px !important; right: 12px !important; }
 
+            /* ══ SWIPE-UP NAV SHEET ════════════════════════════════════════ */
+
+            /* Scrim behind the sheet */
+            #mob-nav-scrim {
+                display: none; /* toggled to block by JS */
+                position: fixed; inset: 0;
+                background: rgba(0,0,0,0.55);
+                z-index: 9800;
+                backdrop-filter: blur(2px);
+                -webkit-backdrop-filter: blur(2px);
+                opacity: 0;
+                transition: opacity 0.28s ease;
+            }
+            #mob-nav-scrim.visible {
+                opacity: 1;
+            }
+
+            /* The sheet itself */
+            #mob-nav-sheet {
+                display: flex; /* overrides the base display:none — JS controls open/close via transform */
+                position: fixed;
+                left: 0; right: 0; bottom: 0;
+                z-index: 9850;
+                background: rgb(var(--bg-sidebar));
+                border-radius: 20px 20px 0 0;
+                border-top: 1px solid rgb(var(--border-color));
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+
+                /* Start hidden below the viewport */
+                transform: translateY(100%);
+                transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+                will-change: transform;
+
+                display: flex;
+                flex-direction: column;
+                max-height: 85vh;
+                overflow: hidden;
+            }
+            #mob-nav-sheet.open {
+                transform: translateY(0);
+            }
+
+            /* Drag handle pill */
+            #mob-nav-sheet-handle {
+                width: 36px; height: 4px;
+                border-radius: 2px;
+                background: rgba(var(--text-muted), 0.35);
+                margin: 10px auto 6px;
+                flex-shrink: 0;
+                cursor: grab;
+            }
+
+            /* Sheet header: workspace switcher */
+            #mob-nav-ws-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 8px 18px 12px;
+                border-bottom: 1px solid rgb(var(--border-color));
+                flex-shrink: 0;
+                gap: 10px;
+            }
+            #mob-nav-ws-name {
+                font-size: 14px;
+                font-weight: 700;
+                color: rgb(var(--text-main));
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex: 1;
+                min-width: 0;
+            }
+            #mob-nav-ws-dot {
+                width: 10px; height: 10px;
+                border-radius: 50%;
+                background: rgb(var(--accent));
+                flex-shrink: 0;
+            }
+            #mob-nav-ws-label {
+                truncate: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            .mob-nav-ws-btn {
+                font-size: 11px;
+                color: rgb(var(--text-muted));
+                background: rgba(var(--text-muted), 0.1);
+                border: 1px solid rgb(var(--border-color));
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+
+            /* Scrollable nav list */
+            #mob-nav-list {
+                flex: 1;
+                overflow-y: auto;
+                padding: 10px 12px 20px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Section labels */
+            .mob-nav-section-label {
+                font-size: 9px;
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: rgb(var(--text-muted));
+                padding: 14px 6px 6px;
+            }
+            .mob-nav-section-label:first-child {
+                padding-top: 4px;
+            }
+
+            /* Nav item rows */
+            .mob-nav-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 11px 12px;
+                border-radius: 10px;
+                cursor: pointer;
+                color: rgb(var(--text-muted));
+                font-size: 14px;
+                font-weight: 500;
+                transition: background 0.15s, color 0.15s;
+                -webkit-tap-highlight-color: transparent;
+                margin-bottom: 1px;
+            }
+            .mob-nav-item:active {
+                background: rgba(var(--accent), 0.1);
+                color: rgb(var(--accent));
+            }
+            .mob-nav-item.mob-nav-active {
+                background: rgba(var(--accent), 0.1);
+                color: rgb(var(--accent));
+                font-weight: 600;
+            }
+            .mob-nav-item svg {
+                width: 18px; height: 18px;
+                flex-shrink: 0;
+                opacity: 0.7;
+            }
+            .mob-nav-item.mob-nav-active svg {
+                opacity: 1;
+            }
+
+            /* Bottom row inside sheet: cmd palette shortcut */
+            #mob-nav-footer {
+                padding: 10px 18px 14px;
+                border-top: 1px solid rgb(var(--border-color));
+                display: flex;
+                gap: 8px;
+                flex-shrink: 0;
+            }
+            .mob-nav-footer-btn {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 10px;
+                border-radius: 10px;
+                background: rgba(var(--text-muted), 0.08);
+                border: 1px solid rgb(var(--border-color));
+                color: rgb(var(--text-muted));
+                font-size: 12px;
+                font-weight: 500;
+                cursor: pointer;
+            }
+            .mob-nav-footer-btn svg {
+                width: 15px; height: 15px;
+            }
+
+            /* ══ END SWIPE-UP NAV SHEET ════════════════════════════════════ */
+
             /* Mini timer position */
             #mini-timer { top: 60px !important; right: 10px !important; }
 
-            /* ── NOTES: editor fills full height, list is a fixed overlay ── */
+            /* ── NOTES: editor fills full height, list is a bottom-sheet overlay ── */
             #app-notes {
                 flex-direction: column !important;
                 overflow: hidden !important;
             }
-            /* Hide the sidebar from normal flow entirely on mobile */
+            /* Bottom Sheet: slides up from the bottom, thumb-friendly */
             #notes-list-panel {
                 position: fixed !important;
-                top: 96px !important; /* mobile header (52px) + browse bar (~44px) */
+                bottom: 62px !important; /* sit above bottom nav bar */
                 left: 0 !important;
                 right: 0 !important;
+                top: auto !important;
                 width: 100% !important;
                 height: auto !important;
                 max-height: 0 !important;
                 overflow: hidden !important;
                 border: none !important;
-                border-bottom: 1px solid rgb(var(--border-color)) !important;
+                border-top: 1px solid rgb(var(--border-color)) !important;
+                border-radius: 18px 18px 0 0 !important;
                 z-index: 200 !important;
                 flex-shrink: 0 !important;
-                transition: max-height 0.28s ease !important;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+                transform: translateY(100%) !important;
+                transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), max-height 0.32s cubic-bezier(0.32, 0.72, 0, 1) !important;
+                box-shadow: 0 -8px 40px rgba(0,0,0,0.5) !important;
+            }
+            /* Drag-handle pill above the sheet */
+            #notes-list-panel::before {
+                content: '';
+                display: block;
+                width: 40px;
+                height: 4px;
+                border-radius: 2px;
+                background: rgb(var(--border-color));
+                margin: 10px auto 0;
+                flex-shrink: 0;
             }
             #notes-list-panel.mob-list-open {
-                max-height: 60vh !important;
+                max-height: 70vh !important;
                 overflow-y: auto !important;
+                transform: translateY(0%) !important;
             }
             #note-list {
-                max-height: calc(60vh - 110px) !important;
+                max-height: calc(70vh - 120px) !important;
                 overflow-y: auto !important;
             }
             /* Editor fills all the space */
@@ -849,6 +1209,39 @@ document.addEventListener('keydown', (e) => {
                 padding: 10px 14px !important;
             }
             /* Generator panel grid: single column */
+
+            /* ── TAP TARGETS: ws-list items, note list items, dropdown rows ── */
+            /* Workspace switcher list items */
+            #ws-list > div,
+            #ws-list button {
+                min-height: 44px !important;
+                padding: 10px 14px !important;
+                font-size: 14px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+            /* Note list items */
+            .note-item {
+                min-height: 60px !important;
+                padding: 10px 10px !important;
+            }
+            /* Nav items in sidebar (when opened as drawer) */
+            .nav-item {
+                min-height: 44px !important;
+                padding: 10px 10px !important;
+                font-size: 14px !important;
+            }
+            /* Command palette results */
+            .cmd-item {
+                min-height: 44px !important;
+                padding: 12px 16px !important;
+            }
+            /* Context menu rows (graph right-click) */
+            #graph-context-menu > div {
+                min-height: 44px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
 
             /* ── WHITEBOARD: compact floating toolbar ── */
             #app-canvas > div:first-of-type {
@@ -989,7 +1382,7 @@ document.addEventListener('keydown', (e) => {
                     <div class="nav-section-body space-y-0.5">
                         <div onclick="switchApp('dashboard')" id="nav-dashboard" class="nav-item active-nav">Dashboard</div>
                         <div onclick="switchApp('graph')" id="nav-graph" class="nav-item">Graph</div>
-                        <div onclick="switchApp('calendar')" id="nav-calendar" class="nav-item">Calendar</div>
+                        <div onclick="switchApp('calendar')" id="nav-calendar" class="nav-item">Schedule</div>
                     </div>
                 </div>
                 <div class="nav-section" data-section="capture">
@@ -1391,19 +1784,58 @@ document.addEventListener('keydown', (e) => {
                     
                     <div id="editor-active" class="hidden h-full flex flex-col w-full relative">
                         <!-- Toolbar -->
-                        <div class="h-auto py-2 border-b border-borderDark flex flex-wrap items-center px-3 justify-between glass-sidebar shrink-0 gap-2">
-                            <div class="flex flex-wrap gap-1.5">
-                                <button onclick="applyNoteTemplate()" class="px-2.5 py-1 text-xs bg-bgDark border border-borderDark text-textMuted rounded-lg hover:text-textMain hover:border-accent/40 transition" title="Insert template">Template</button>
-                                <button onclick="extractTasks()" class="px-2.5 py-1 text-xs bg-accent/10 border border-accent/20 text-accent font-semibold rounded-lg hover:bg-accent/20 transition">Extract Tasks</button>
-                                <button onclick="extractFlashcards()" class="px-2.5 py-1 text-xs bg-mint/10 border border-mint/20 text-mint font-semibold rounded-lg hover:bg-mint/20 transition">Extract Cards</button>
-                                <div class="w-px h-5 bg-borderDark mx-0.5 self-center"></div>
-                                <button onclick="undoNote()" class="w-7 h-7 rounded-lg bg-bgDark border border-borderDark text-textMain hover:bg-black/20 transition flex items-center justify-center text-sm" title="Undo (Ctrl+Z)">↩</button>
-                                <button onclick="redoNote()" class="w-7 h-7 rounded-lg bg-bgDark border border-borderDark text-textMain hover:bg-black/20 transition flex items-center justify-center text-sm" title="Redo (Ctrl+Y)">↪</button>
+                        <div class="h-auto py-2 border-b border-borderDark flex items-center px-3 justify-between glass-sidebar shrink-0 gap-2">
+                            <div class="flex gap-1.5 items-center">
+                                <!-- Undo / Redo — always visible -->
+                                <button id="btn-undo" onclick="undoNote()" class="w-7 h-7 rounded-lg bg-bgDark border border-borderDark text-textMain hover:bg-black/20 transition flex items-center justify-center text-sm" title="Undo (Ctrl+Z)">↩</button>
+                                <button id="btn-redo" onclick="redoNote()" class="w-7 h-7 rounded-lg bg-bgDark border border-borderDark text-textMain hover:bg-black/20 transition flex items-center justify-center text-sm" title="Redo (Ctrl+Y)">↪</button>
+                                <div id="toolbar-divider" class="w-px h-5 bg-borderDark mx-0.5 self-center"></div>
+                                <!-- Desktop: show all actions inline -->
+                                <button onclick="applyNoteTemplate()" class="hidden md:inline-flex px-2.5 py-1 text-xs bg-bgDark border border-borderDark text-textMuted rounded-lg hover:text-textMain hover:border-accent/40 transition" title="Insert template">Template</button>
+                                <button onclick="extractTasks()" class="hidden md:inline-flex px-2.5 py-1 text-xs bg-accent/10 border border-accent/20 text-accent font-semibold rounded-lg hover:bg-accent/20 transition">Extract Tasks</button>
+                                <button onclick="extractFlashcards()" class="hidden md:inline-flex px-2.5 py-1 text-xs bg-mint/10 border border-mint/20 text-mint font-semibold rounded-lg hover:bg-mint/20 transition">Extract Cards</button>
                             </div>
                             <div class="flex gap-2 items-center">
                                 <span id="note-wordcount" class="text-[10px] text-textMuted font-mono hidden"></span>
-                                <span id="note-timestamp" class="text-[10px] text-textMuted"></span>
-                                <button onclick="deleteCurrentNote()" class="px-2.5 py-1 text-xs text-red-400/70 hover:text-red-400 border border-red-400/20 hover:border-red-400/40 rounded-lg transition">Delete</button>
+                                <span id="note-timestamp" class="text-[10px] text-textMuted hidden md:inline"></span>
+                                <!-- Desktop: Delete visible inline -->
+                                <button onclick="deleteCurrentNote()" class="hidden md:inline-flex px-2.5 py-1 text-xs text-red-400/70 hover:text-red-400 border border-red-400/20 hover:border-red-400/40 rounded-lg transition">Delete</button>
+                                <!-- Mobile: ··· overflow button -->
+                                <div class="relative md:hidden" id="note-overflow-wrap">
+                                    <button id="note-overflow-btn"
+                                        onclick="noteOverflowToggle()"
+                                        class="w-8 h-8 rounded-lg bg-bgDark border border-borderDark text-textMuted hover:text-textMain flex items-center justify-center transition"
+                                        aria-label="More note actions"
+                                        aria-expanded="false"
+                                        aria-haspopup="true">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                            <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                                        </svg>
+                                    </button>
+                                    <!-- Popover -->
+                                    <div id="note-overflow-menu"
+                                        class="hidden absolute right-0 top-10 z-[9500] min-w-[180px] rounded-xl border border-borderDark overflow-hidden shadow-2xl"
+                                        style="background: rgb(var(--bg-sidebar));">
+                                        <div class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest" style="color: rgb(var(--text-muted)); border-bottom: 1px solid rgb(var(--border-color));">Note Actions</div>
+                                        <button onclick="applyNoteTemplate(); noteOverflowClose()" class="note-overflow-item">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                                            Template
+                                        </button>
+                                        <button onclick="extractTasks(); noteOverflowClose()" class="note-overflow-item" style="color: rgb(var(--accent));">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                            Extract Tasks
+                                        </button>
+                                        <button onclick="extractFlashcards(); noteOverflowClose()" class="note-overflow-item" style="color: rgb(var(--mint, 52 211 153));">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                            Extract Cards
+                                        </button>
+                                        <div style="height:1px; background: rgb(var(--border-color)); margin: 2px 0;"></div>
+                                        <button onclick="deleteCurrentNote(); noteOverflowClose()" class="note-overflow-item" style="color: rgb(239 68 68 / 0.8);">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                                            Delete Note
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1424,25 +1856,29 @@ document.addEventListener('keydown', (e) => {
                             <div id="editor-tab-write" class="flex flex-col h-full w-full">
                                 <input type="text" id="note-title" oninput="saveNotes()" placeholder="Untitled Note" class="bg-transparent text-xl md:text-2xl font-bold outline-none text-textMain w-full px-4 md:px-6 pt-4 md:pt-5 pb-2 drop-shadow-md shrink-0"/>
                                 <input type="text" id="note-tags" oninput="saveNotes()" placeholder="Add tags..." class="bg-transparent outline-none text-accent text-xs px-4 md:px-6 pb-3 border-b border-borderDark shrink-0"/>
-                                <div class="flex flex-wrap items-center gap-1 px-2 md:px-4 py-1.5 border-b border-borderDark glass-sidebar shrink-0 text-textMuted">
-                                    <button type="button" title="Bold (Ctrl+B)" onclick="mdWrap('**','**')" class="px-2 py-1 text-xs font-bold rounded hover:bg-bgDark hover:text-textMain">B</button>
-                                    <button type="button" title="Italic (Ctrl+I)" onclick="mdWrap('*','*')" class="px-2 py-1 text-xs italic rounded hover:bg-bgDark hover:text-textMain">I</button>
-                                    <button type="button" title="Strikethrough" onclick="mdWrap('~~','~~')" class="px-2 py-1 text-xs line-through rounded hover:bg-bgDark hover:text-textMain">S</button>
-                                    <span class="w-px h-4 bg-borderDark mx-1"></span>
-                                    <button type="button" title="Heading 1" onclick="mdLinePrefix('# ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain">H1</button>
-                                    <button type="button" title="Heading 2" onclick="mdLinePrefix('## ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain">H2</button>
-                                    <button type="button" title="Heading 3" onclick="mdLinePrefix('### ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain">H3</button>
-                                    <span class="w-px h-4 bg-borderDark mx-1"></span>
-                                    <button type="button" title="Bullet list" onclick="mdLinePrefix('- ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain">• List</button>
-                                    <button type="button" title="Numbered list" onclick="mdLinePrefix('1. ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain">1. List</button>
-                                    <button type="button" title="Task list" onclick="mdLinePrefix('- [ ] ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain">&#9744; Task</button>
-                                    <button type="button" title="Quote" onclick="mdLinePrefix('> ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain">&#10077;</button>
-                                    <span class="w-px h-4 bg-borderDark mx-1"></span>
-                                    <button type="button" title="Inline code" onclick="mdWrap('`','`')" class="px-2 py-1 text-xs font-mono rounded hover:bg-bgDark hover:text-textMain">&lt;/&gt;</button>
-                                    <button type="button" title="Link (Ctrl+K)" onclick="mdInsertLink()" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain">&#128279;</button>
-                                    <button type="button" title="Table" onclick="mdInsertTable()" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain">&#9646;</button>
-                                    <button type="button" title="Horizontal rule" onclick="mdInsertAtCursor('\n\n---\n\n')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain">&mdash;</button>
-                                    <span class="ml-auto text-[10px] text-textMuted px-2 hidden md:inline">Markdown (GFM) supported</span>
+                                <div class="relative border-b border-borderDark glass-sidebar shrink-0 md-toolbar-wrap">
+                                    <div class="flex items-center gap-1 px-2 md:px-4 py-1.5 text-textMuted overflow-x-auto md-toolbar-scroll" style="scrollbar-width:none;-ms-overflow-style:none;">
+                                        <button type="button" title="Bold (Ctrl+B)" onclick="mdWrap('**','**')" class="px-2 py-1 text-xs font-bold rounded hover:bg-bgDark hover:text-textMain shrink-0">B</button>
+                                        <button type="button" title="Italic (Ctrl+I)" onclick="mdWrap('*','*')" class="px-2 py-1 text-xs italic rounded hover:bg-bgDark hover:text-textMain shrink-0">I</button>
+                                        <button type="button" title="Strikethrough" onclick="mdWrap('~~','~~')" class="px-2 py-1 text-xs line-through rounded hover:bg-bgDark hover:text-textMain shrink-0">S</button>
+                                        <span class="w-px h-4 bg-borderDark mx-1 shrink-0"></span>
+                                        <button type="button" title="Heading 1" onclick="mdLinePrefix('# ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain shrink-0">H1</button>
+                                        <button type="button" title="Heading 2" onclick="mdLinePrefix('## ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain shrink-0">H2</button>
+                                        <button type="button" title="Heading 3" onclick="mdLinePrefix('### ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain shrink-0">H3</button>
+                                        <span class="w-px h-4 bg-borderDark mx-1 shrink-0"></span>
+                                        <button type="button" title="Bullet list" onclick="mdLinePrefix('- ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">• List</button>
+                                        <button type="button" title="Numbered list" onclick="mdLinePrefix('1. ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">1. List</button>
+                                        <button type="button" title="Task list" onclick="mdLinePrefix('- [ ] ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&#9744; Task</button>
+                                        <button type="button" title="Quote" onclick="mdLinePrefix('> ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&#10077;</button>
+                                        <span class="w-px h-4 bg-borderDark mx-1 shrink-0"></span>
+                                        <button type="button" title="Inline code" onclick="mdWrap('`','`')" class="px-2 py-1 text-xs font-mono rounded hover:bg-bgDark hover:text-textMain shrink-0">&lt;/&gt;</button>
+                                        <button type="button" title="Link (Ctrl+K)" onclick="mdInsertLink()" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&#128279;</button>
+                                        <button type="button" title="Table" onclick="mdInsertTable()" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&#9646;</button>
+                                        <button type="button" title="Horizontal rule" onclick="mdInsertAtCursor('\n\n---\n\n')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&mdash;</button>
+                                        <span class="ml-auto text-[10px] text-textMuted px-2 hidden md:inline shrink-0">Markdown (GFM) supported</span>
+                                    </div>
+                                    <!-- fade-out scroll hint, mobile only -->
+                                    <div class="md-toolbar-fade pointer-events-none"></div>
                                 </div>
                                 <textarea id="note-body-raw" oninput="handleEditorInput(event); checkWikiLinkSuggestion();" onkeydown="handleEditorKeydown(event)" ondragover="noteEditorDragOver(event)" ondrop="noteEditorDrop(event)" onfocus="checkWikiLinkSuggestion()" onblur="setTimeout(()=>{const p=document.getElementById('wiki-suggest-popup'); if(p)p.classList.add('hidden');}, 200)" class="flex-1 w-full bg-transparent text-textMain font-mono text-[14px] md:text-[13px] outline-none resize-none leading-relaxed p-4 md:p-6 drop-shadow-sm" placeholder="Write here... [[ wiki-links, # tags, @ dates, / blocks, Q :: A cards."></textarea>
                             </div>
@@ -1500,7 +1936,7 @@ document.addEventListener('keydown', (e) => {
             <!-- KNOWLEDGE GRAPH -->
             <section id="app-graph" class="app-module hidden relative glass-bg">
                 <div class="absolute top-4 left-4 z-10 hidden md:block">
-                    <p class="text-xs text-textMuted drop-shadow-md">Right-click nodes to move/delete. Click to preview.</p>
+                    <p class="text-xs text-textMuted drop-shadow-md">Scroll to zoom · drag background to pan · drag nodes to reposition · right-click for options.</p>
                 </div>
                 
                 <!-- Graph Force Controls -->
@@ -1736,18 +2172,18 @@ document.addEventListener('keydown', (e) => {
                     <h2 class="text-xl md:text-2xl font-bold text-textMain drop-shadow-sm">Task Board</h2>
                     <button onclick="addKanbanTask()" class="px-4 py-2 md:py-1.5 glass-sidebar border border-borderDark text-textMain text-sm font-medium rounded-lg hover:bg-black/20">+ Add Task</button>
                 </div>
-                <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto md:overflow-hidden pb-20 md:pb-10">
-                    <div class="glass-sidebar border border-borderDark p-4 rounded-xl flex flex-col min-h-[300px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'todo', this)">
-                        <h3 class="text-[11px] font-bold tracking-wider uppercase mb-3 text-textMuted flex justify-between">To Do <span id="count-todo">0</span></h3>
-                        <div id="kb-todo" class="flex-1 space-y-3 md:space-y-2 overflow-y-auto pr-1"></div>
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 overflow-y-auto md:overflow-hidden pb-20 md:pb-10">
+                    <div class="glass-sidebar border border-borderDark p-2.5 md:p-4 rounded-xl flex flex-col min-h-[180px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'todo', this)">
+                        <h3 class="text-[11px] font-bold tracking-wider uppercase mb-2 md:mb-3 text-textMuted flex justify-between">To Do <span id="count-todo">0</span></h3>
+                        <div id="kb-todo" class="flex-1 space-y-2 overflow-y-auto pr-1"></div>
                     </div>
-                    <div class="glass-sidebar border border-borderDark p-4 rounded-xl flex flex-col min-h-[300px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'progress', this)">
-                        <h3 class="text-[11px] font-bold tracking-wider uppercase mb-3 text-accent flex justify-between">In Progress <span id="count-progress">0</span></h3>
-                        <div id="kb-progress" class="flex-1 space-y-3 md:space-y-2 overflow-y-auto pr-1"></div>
+                    <div class="glass-sidebar border border-borderDark p-2.5 md:p-4 rounded-xl flex flex-col min-h-[180px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'progress', this)">
+                        <h3 class="text-[11px] font-bold tracking-wider uppercase mb-2 md:mb-3 text-accent flex justify-between">In Progress <span id="count-progress">0</span></h3>
+                        <div id="kb-progress" class="flex-1 space-y-2 overflow-y-auto pr-1"></div>
                     </div>
-                    <div class="glass-sidebar border border-borderDark p-4 rounded-xl flex flex-col min-h-[300px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'done', this)">
-                        <h3 class="text-[11px] font-bold tracking-wider uppercase mb-3 text-mint flex justify-between">Done <span id="count-done">0</span></h3>
-                        <div id="kb-done" class="flex-1 space-y-3 md:space-y-2 overflow-y-auto pr-1"></div>
+                    <div class="glass-sidebar border border-borderDark p-2.5 md:p-4 rounded-xl flex flex-col min-h-[180px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'done', this)">
+                        <h3 class="text-[11px] font-bold tracking-wider uppercase mb-2 md:mb-3 text-mint flex justify-between">Done <span id="count-done">0</span></h3>
+                        <div id="kb-done" class="flex-1 space-y-2 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
             </section>
@@ -4151,6 +4587,12 @@ document.addEventListener('keydown', (e) => {
                 if (b) { b.classList.remove('text-accent', 'border-accent'); b.classList.add('text-textMuted', 'border-transparent'); }
             });
 
+            // Toggle mobile preview-mode hiding of undo/redo/overflow
+            const editorToolbar = document.querySelector('#editor-active .glass-sidebar.shrink-0');
+            if (editorToolbar) {
+                editorToolbar.classList.toggle('note-preview-mode', tab === 'preview');
+            }
+
             if (tab === 'write') {
                 writeTab.classList.remove('hidden'); writeTab.style.display = 'flex';
                 writBtn.classList.add('text-accent', 'border-accent');
@@ -4273,7 +4715,41 @@ document.addEventListener('keydown', (e) => {
 
                 if(activeNodes.length === 0) { container.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-textMuted drop-shadow-md">you ahh does not have any notes idiot</div>'; document.getElementById('graph-legend').innerHTML = ''; return; }
 
-                const svg = d3.select("#d3-graph-container").append("svg").attr("width", width).attr("height", height);
+                const svg = d3.select("#d3-graph-container").append("svg")
+                    .attr("width", width).attr("height", height)
+                    .style("touch-action", "none"); // let D3 handle all touch gestures
+
+                // ── PAN + ZOOM (desktop scroll-wheel & trackpad, mobile pinch) ──────
+                const zoomLayer = svg.append("g").attr("id", "graph-zoom-layer");
+
+                const zoomBehaviour = d3.zoom()
+                    .scaleExtent([0.1, 8])
+                    .on("zoom", (event) => {
+                        zoomLayer.attr("transform", event.transform);
+                    });
+
+                svg.call(zoomBehaviour)
+                   // Prevent the zoom from eating right-click context menu
+                   .on("dblclick.zoom", null);
+
+                // Mobile hint + reset-view button (only shown on touch devices)
+                const isMobile = window.innerWidth < 768;
+                if (isMobile) {
+                    const resetBtn = document.createElement('button');
+                    resetBtn.textContent = '⌖ Reset View';
+                    resetBtn.style.cssText = `
+                        position:absolute; bottom:16px; right:16px; z-index:50;
+                        padding:8px 14px; font-size:12px; font-weight:600;
+                        border-radius:10px; border:1px solid rgb(var(--border-color));
+                        background:rgb(var(--bg-sidebar)); color:rgb(var(--text-muted));
+                        cursor:pointer; backdrop-filter:blur(8px);
+                    `;
+                    resetBtn.onclick = () => {
+                        svg.transition().duration(400)
+                           .call(zoomBehaviour.transform, d3.zoomIdentity);
+                    };
+                    container.appendChild(resetBtn);
+                }
 
                 // FEATURE: color-by mode (tag / workspace / connectivity / accent)
                 const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
@@ -4317,12 +4793,15 @@ document.addEventListener('keydown', (e) => {
                     .alphaDecay(0.04)
                     .on("end", () => { graphSimulation.stop(); });
                 
-                const link = svg.append("g").selectAll("line").data(activeLinks).enter().append("line").attr("class", "link");
-                const node = svg.append("g").selectAll("circle").data(activeNodes).enter().append("circle")
+                // All graph content goes inside zoomLayer so transforms apply correctly
+                const link = zoomLayer.append("g").selectAll("line").data(activeLinks).enter().append("line").attr("class", "link");
+                const node = zoomLayer.append("g").selectAll("circle").data(activeNodes).enter().append("circle")
                     .attr("class", "node")
                     .attr("r", d => (window.innerWidth < 768 ? 10 : 6) + Math.min(8, d.degree))
                     .attr("fill", colorFor)
                     .call(d3.drag()
+                        // Filter drag so it only fires on single-touch (not pinch)
+                        .filter(event => !event.ctrlKey && (event.type !== 'touchstart' || event.touches.length === 1))
                         .on("start", (e,d)=>{ if(!e.active) graphSimulation.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
                         .on("drag",  (e,d)=>{ d.fx=e.x; d.fy=e.y; })
                         .on("end",   (e,d)=>{ if(!e.active) graphSimulation.alphaTarget(0); d.fx=null; d.fy=null; })
@@ -4365,7 +4844,7 @@ document.addEventListener('keydown', (e) => {
                     }
                 });
 
-                const labels = svg.append("g").selectAll("text").data(activeNodes).enter().append("text").attr("class", "node-label drop-shadow-md").attr("dy", -16).text(d => d.title);
+                const labels = zoomLayer.append("g").selectAll("text").data(activeNodes).enter().append("text").attr("class", "node-label drop-shadow-md").attr("dy", -16).text(d => d.title);
                 graphSimulation.on("tick", () => { link.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y); node.attr("cx", d => d.x).attr("cy", d => d.y); labels.attr("x", d => d.x).attr("y", d => d.y); });
             }, 10);
         }
@@ -4679,11 +5158,11 @@ document.addEventListener('keydown', (e) => {
                 const tasks = state.kanban[col].filter(t => t.workspaceId === state.activeWorkspace);
                 document.getElementById(`count-${col}`).innerText = tasks.length;
                 document.getElementById(`kb-${col}`).innerHTML = tasks.map(task => `
-                    <div class="glass-bg border border-borderDark p-4 md:p-3 rounded-lg shadow-sm cursor-grab active:cursor-grabbing text-sm flex flex-col group relative lift" draggable="true" ondragstart="dragCard(event, '${task.id}', '${col}')">
+                    <div class="glass-bg border border-borderDark p-4 md:p-3 rounded-lg shadow-sm cursor-grab active:cursor-grabbing text-sm flex flex-col group relative lift" draggable="true" ondragstart="dragCard(event, '${task.id}', '${col}')" data-task-id="${task.id}" data-task-col="${col}">
                         <div class="flex justify-between items-start mb-2">
                             <span class="font-medium text-textMain text-base md:text-sm">${task.title}</span>
                             <div class="flex gap-1 shrink-0">
-                                <button onclick="moveTaskMobile('${task.id}', '${col}')" class="md:hidden text-textMuted hover:text-accent transition text-xl px-2 opacity-100">↔</button>
+                                <button onclick="moveTaskMobile('${task.id}', '${col}')" class="kb-move-btn md:hidden text-textMuted hover:text-accent transition text-xl px-2 opacity-100">↔</button>
                                 <button onclick="deleteTask('${task.id}', '${col}')" class="text-textMuted hover:text-red-400 transition text-xl md:text-sm px-2 md:px-0 opacity-100 md:opacity-0 md:group-hover:opacity-100">✕</button>
                             </div>
                         </div>
@@ -5217,32 +5696,98 @@ document.addEventListener('keydown', (e) => {
                 document.addEventListener('pointerlockerror', onPointerLockError);
             }
             
-            // Touch Support
+            // ── TOUCH SUPPORT (mobile) ────────────────────────────────────────────
+            // Rule: 1 finger = draw/erase/tool action  |  2 fingers = pan + pinch-zoom
+            let _pinchStartDist = 0;
+            let _pinchStartZoom = 1;
+            let _pinchMidStart  = { x: 0, y: 0 };
+            let _pinchCamStart  = { x: 0, y: 0 };
+
+            function _midpoint(t) {
+                return {
+                    x: (t[0].clientX + t[1].clientX) / 2,
+                    y: (t[0].clientY + t[1].clientY) / 2
+                };
+            }
+            function _dist(t) {
+                const dx = t[0].clientX - t[1].clientX;
+                const dy = t[0].clientY - t[1].clientY;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+
             canvas.addEventListener('touchstart', (e) => {
-                if(e.touches.length === 1 && currentTool !== 'pan') {
-                    const pos = getTouchPos(e); 
-                    if(currentTool === 'text') { handleTextTool(pos); return; }
-                    if(currentTool === 'fill') { applyFillTool(pos); return; }
-                    if(currentTool === 'eraser') {
-                        isDrawing = true;
-                        currentStroke = { tool: 'eraser', eraserSize: eraserSize, points: [pos], workspaceId: state.activeWorkspace };
+                e.preventDefault();
+
+                if (e.touches.length === 2) {
+                    // ── Two fingers: begin pan+pinch, cancel any active stroke ──
+                    isDrawing = false;
+                    currentStroke = null;
+                    isPanning = false; // we handle 2-finger pan ourselves below
+                    _pinchStartDist = _dist(e.touches);
+                    _pinchStartZoom = camera.zoom;
+                    _pinchMidStart  = _midpoint(e.touches);
+                    _pinchCamStart  = { x: camera.x, y: camera.y };
+                    return;
+                }
+
+                // ── One finger: draw / tool action ──
+                if (e.touches.length === 1) {
+                    const pos = getTouchPos(e);
+                    if (currentTool === 'pan') {
+                        isPanning = true;
+                        startPan = { x: e.touches[0].clientX - camera.x, y: e.touches[0].clientY - camera.y };
+                        if (toggleOcclusionAt(pos)) isPanning = false;
                         return;
                     }
-                    isDrawing = true; currentStroke = { tool: currentTool, color: (canvasCurrentColor || state.settings.accent), points: [pos], workspaceId: state.activeWorkspace }; 
-                    if(['rect', 'circle', 'line', 'sticky', 'occlude'].includes(currentTool)) currentStroke.rectEnd = pos;
-                } else if(currentTool === 'pan' || e.touches.length > 1) {
-                    isPanning = true; startPan = { x: e.touches[0].clientX - camera.x, y: e.touches[0].clientY - camera.y };
-                    // tap-to-reveal occlusion masks
-                    if(currentTool === 'pan' && e.touches.length === 1){
-                        const pos = getTouchPos(e);
-                        if(toggleOcclusionAt(pos)) { isPanning = false; }
+                    if (currentTool === 'text')   { handleTextTool(pos); return; }
+                    if (currentTool === 'fill')   { applyFillTool(pos); return; }
+                    if (currentTool === 'eraser') {
+                        isDrawing = true;
+                        currentStroke = { tool: 'eraser', eraserSize, points: [pos], workspaceId: state.activeWorkspace };
+                        return;
                     }
+                    isDrawing = true;
+                    currentStroke = { tool: currentTool, color: (canvasCurrentColor || state.settings.accent), points: [pos], workspaceId: state.activeWorkspace };
+                    if (['rect','circle','line','sticky','occlude'].includes(currentTool)) currentStroke.rectEnd = pos;
                 }
-            }, {passive: false});
+            }, { passive: false });
+
             canvas.addEventListener('touchmove', (e) => {
                 e.preventDefault();
-                if (isPanning) { camera.x = e.touches[0].clientX - startPan.x; camera.y = e.touches[0].clientY - startPan.y; redrawCanvas(); } 
-                else if (isDrawing && currentStroke) { 
+
+                if (e.touches.length === 2) {
+                    // ── Pinch-zoom ──
+                    const newDist = _dist(e.touches);
+                    const newMid  = _midpoint(e.touches);
+                    const rect    = canvas.getBoundingClientRect();
+
+                    // Scale zoom around the midpoint
+                    const scale = newDist / (_pinchStartDist || 1);
+                    const newZoom = Math.max(0.1, Math.min(_pinchStartZoom * scale, 10));
+
+                    // World coordinate that was under the initial midpoint
+                    const wx = (_pinchMidStart.x - rect.left - _pinchCamStart.x) / _pinchStartZoom;
+                    const wy = (_pinchMidStart.y - rect.top  - _pinchCamStart.y) / _pinchStartZoom;
+
+                    // Pan delta (two fingers moving together)
+                    const panDx = newMid.x - _pinchMidStart.x;
+                    const panDy = newMid.y - _pinchMidStart.y;
+
+                    camera.zoom = newZoom;
+                    camera.x = (_pinchMidStart.x - rect.left) - wx * newZoom + panDx;
+                    camera.y = (_pinchMidStart.y - rect.top)  - wy * newZoom + panDy;
+                    redrawCanvas();
+                    return;
+                }
+
+                if (e.touches.length === 1) {
+                    if (isPanning) {
+                        camera.x = e.touches[0].clientX - startPan.x;
+                        camera.y = e.touches[0].clientY - startPan.y;
+                        redrawCanvas();
+                        return;
+                    }
+                    if (!isDrawing || !currentStroke) return;
                     const pos = getTouchPos(e);
                     if (currentTool === 'eraser') {
                         currentStroke.points.push(pos);
@@ -5256,16 +5801,23 @@ document.addEventListener('keydown', (e) => {
                         ctx.moveTo(currentStroke.points[0].x, currentStroke.points[0].y);
                         for (let i = 1; i < currentStroke.points.length; i++) ctx.lineTo(currentStroke.points[i].x, currentStroke.points[i].y);
                         ctx.stroke(); ctx.restore();
-                    } else if(currentTool === 'draw') {
+                    } else if (currentTool === 'draw') {
                         currentStroke.points.push(pos);
                         redrawCanvas(); drawTempStroke(currentStroke);
-                    } else if(['rect', 'circle', 'line', 'sticky', 'occlude'].includes(currentTool)) {
+                    } else if (['rect','circle','line','sticky','occlude'].includes(currentTool)) {
                         currentStroke.rectEnd = pos;
                         redrawCanvas(); drawTempStroke(currentStroke);
                     }
                 }
-            }, {passive: false});
-            canvas.addEventListener('touchend', endAction);
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', (e) => {
+                // Reset pinch state when fingers lift
+                if (e.touches.length < 2) {
+                    _pinchStartDist = 0;
+                }
+                endAction();
+            });
             
             // Mouse Support
             canvas.addEventListener('mousedown', (e) => {
@@ -7731,6 +8283,630 @@ Rules:
         // Kick off on DOMContentLoaded
         document.addEventListener('DOMContentLoaded', initTaskNotifications);
 
+        /* ═══════════════════════════════════════════════════════════════
+           KANBAN TOUCH DRAG-AND-DROP ENGINE
+           Replaces the non-functional HTML5 drag API on touch screens.
+           Works in parallel with the existing mouse drag (desktop unchanged).
+
+           Flow:
+             touchstart  → identify card, create ghost clone, dim source
+             touchmove   → move ghost under finger, find target column,
+                           show drop indicator at exact insert position
+             touchend    → move task in state, clean up all visual artefacts
+        ════════════════════════════════════════════════════════════════ */
+        (function initKanbanTouch() {
+
+            /* ── State ── */
+            let ghost        = null;   // floating clone element
+            let sourceEl     = null;   // original card DOM node
+            let sourceCol    = null;   // 'todo' | 'progress' | 'done'
+            let taskId       = null;   // task id string
+            let indicator    = null;   // drop position line element
+            let activeColEl  = null;   // currently hovered column wrapper
+            let insertBefore = null;   // card node to insert before (null = append)
+            let startX       = 0;
+            let startY       = 0;
+            let ghostW       = 0;
+            let ghostH       = 0;
+            const THRESHOLD  = 6;      // px of movement before drag activates
+            let didDrag      = false;
+
+            /* ── Column map (id → col key) ── */
+            const COL_MAP = { 'kb-todo': 'todo', 'kb-progress': 'progress', 'kb-done': 'done' };
+
+            /* ── Helpers ── */
+            function getCard(el) {
+                return el.closest('[data-task-id]');
+            }
+
+            function getColContainer(el) {
+                // Returns the inner card-list div (kb-todo / kb-progress / kb-done)
+                return el.closest('#kb-todo, #kb-progress, #kb-done');
+            }
+
+            function getColWrapper(el) {
+                // Returns the outer .kb-col panel
+                return el.closest('.kb-col');
+            }
+
+            function createGhost(card, touchX, touchY) {
+                const rect = card.getBoundingClientRect();
+                ghostW = rect.width;
+                ghostH = rect.height;
+                ghost = card.cloneNode(true);
+                ghost.classList.add('kb-drag-ghost');
+                ghost.style.width  = ghostW + 'px';
+                ghost.style.height = ghostH + 'px';
+                ghost.style.left   = (touchX - ghostW / 2) + 'px';
+                ghost.style.top    = (touchY - ghostH / 2) + 'px';
+                document.body.appendChild(ghost);
+            }
+
+            function moveGhost(touchX, touchY) {
+                if (!ghost) return;
+                ghost.style.left = (touchX - ghostW / 2) + 'px';
+                ghost.style.top  = (touchY - ghostH / 2) + 'px';
+            }
+
+            function removeGhost() {
+                if (ghost) { ghost.remove(); ghost = null; }
+            }
+
+            function removeIndicator() {
+                if (indicator) { indicator.remove(); indicator = null; }
+                insertBefore = null;
+            }
+
+            function clearColHighlight() {
+                if (activeColEl) {
+                    activeColEl.classList.remove('kb-col-touch-over');
+                    activeColEl = null;
+                }
+            }
+
+            function cleanup() {
+                removeGhost();
+                removeIndicator();
+                clearColHighlight();
+                if (sourceEl) {
+                    sourceEl.classList.remove('kb-dragging-source');
+                    sourceEl = null;
+                }
+                sourceCol = null; taskId = null; didDrag = false; insertBefore = null;
+            }
+
+            /* Find which card in a list the finger is hovering above,
+               and place the indicator line above that card (or at the bottom). */
+            function updateDropIndicator(listEl, touchY) {
+                removeIndicator();
+                const cards = [...listEl.querySelectorAll('[data-task-id]')]
+                    .filter(c => c !== sourceEl);
+
+                insertBefore = null;
+                let placed = false;
+
+                for (const card of cards) {
+                    const r = card.getBoundingClientRect();
+                    const mid = r.top + r.height / 2;
+                    if (touchY < mid) {
+                        insertBefore = card;
+                        indicator = document.createElement('div');
+                        indicator.className = 'kb-drop-indicator';
+                        listEl.insertBefore(indicator, card);
+                        placed = true;
+                        break;
+                    }
+                }
+
+                if (!placed) {
+                    // Append indicator at the bottom
+                    indicator = document.createElement('div');
+                    indicator.className = 'kb-drop-indicator';
+                    listEl.appendChild(indicator);
+                }
+            }
+
+            /* ── touchstart ── */
+            document.addEventListener('touchstart', function(e) {
+                const card = getCard(e.target);
+                if (!card) return;
+
+                // Only activate on mobile widths
+                if (window.innerWidth > 767) return;
+
+                const touch = e.touches[0];
+                startX   = touch.clientX;
+                startY   = touch.clientY;
+                sourceEl = card;
+                taskId   = card.dataset.taskId;
+                sourceCol = card.dataset.taskCol;
+                didDrag  = false;
+            }, { passive: true });
+
+            /* ── touchmove ── */
+            document.addEventListener('touchmove', function(e) {
+                if (!sourceEl) return;
+
+                const touch = e.touches[0];
+                const dx = touch.clientX - startX;
+                const dy = touch.clientY - startY;
+
+                // Activate drag once finger moves past threshold
+                if (!didDrag) {
+                    if (Math.sqrt(dx*dx + dy*dy) < THRESHOLD) return;
+                    didDrag = true;
+                    sourceEl.classList.add('kb-dragging-source');
+                    createGhost(sourceEl, touch.clientX, touch.clientY);
+                }
+
+                e.preventDefault(); // block page scroll while dragging a card
+                moveGhost(touch.clientX, touch.clientY);
+
+                // Hit-test: find the column under the finger
+                ghost.style.display = 'none'; // hide ghost so elementFromPoint works
+                const elUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                ghost.style.display = '';
+
+                const listEl = elUnder ? getColContainer(elUnder) : null;
+                const wrapEl = elUnder ? getColWrapper(elUnder) : null;
+
+                if (listEl && COL_MAP[listEl.id] !== undefined) {
+                    // Highlight column wrapper
+                    if (wrapEl && wrapEl !== activeColEl) {
+                        clearColHighlight();
+                        activeColEl = wrapEl;
+                        activeColEl.classList.add('kb-col-touch-over');
+                    }
+                    updateDropIndicator(listEl, touch.clientY);
+                } else {
+                    clearColHighlight();
+                    removeIndicator();
+                }
+
+            }, { passive: false });
+
+            /* ── touchend ── */
+            document.addEventListener('touchend', function(e) {
+                if (!sourceEl || !didDrag) { cleanup(); return; }
+
+                const touch = e.changedTouches[0];
+
+                // Find drop target column
+                ghost.style.display = 'none';
+                const elUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                ghost.style.display = '';
+
+                const listEl = elUnder ? getColContainer(elUnder) : null;
+                const targetCol = listEl ? COL_MAP[listEl.id] : null;
+
+                if (targetCol && taskId) {
+                    const isSameCol = targetCol === sourceCol;
+                    const taskIndex = state.kanban[sourceCol].findIndex(t => t.id === taskId);
+                    if (taskIndex !== -1) {
+                        // Remove from source
+                        const [task] = state.kanban[sourceCol].splice(taskIndex, 1);
+
+                        if (isSameCol && insertBefore) {
+                            // Reorder within same column
+                            const targetIndex = state.kanban[targetCol].findIndex(
+                                t => t.id === insertBefore.dataset.taskId
+                            );
+                            if (targetIndex !== -1) {
+                                state.kanban[targetCol].splice(targetIndex, 0, task);
+                            } else {
+                                state.kanban[targetCol].push(task);
+                            }
+                        } else {
+                            // Move to different column — insert at position or append
+                            if (insertBefore && insertBefore.dataset.taskId) {
+                                const targetIndex = state.kanban[targetCol].findIndex(
+                                    t => t.id === insertBefore.dataset.taskId
+                                );
+                                if (targetIndex !== -1) {
+                                    state.kanban[targetCol].splice(targetIndex, 0, task);
+                                } else {
+                                    state.kanban[targetCol].push(task);
+                                }
+                            } else {
+                                state.kanban[targetCol].push(task);
+                            }
+                        }
+
+                        if (targetCol === 'done' && sourceCol !== 'done') {
+                            trackActivity('tasks');
+                        }
+                        saveDataToDB();
+                        renderKanban();
+                    }
+                }
+
+                cleanup();
+            }, { passive: true });
+
+            /* ── touchcancel ── */
+            document.addEventListener('touchcancel', cleanup, { passive: true });
+
+        })(); /* end initKanbanTouch */
+
+        /* ═══════════════════════════════════════════════════════════════
+           SWIPE-UP NAV SHEET ENGINE
+        ════════════════════════════════════════════════════════════════ */
+        (function initMobNavSheet() {
+
+            const sheet   = () => document.getElementById('mob-nav-sheet');
+            const scrim   = () => document.getElementById('mob-nav-scrim');
+            const handle  = () => document.getElementById('mob-nav-sheet-handle');
+
+            /* ── Open / Close ── */
+            window.mobNavSheetOpen = function() {
+                if (window.innerWidth > 767) return;
+                const s = scrim(); const sh = sheet();
+                s.style.display = 'block';
+                // Force reflow before adding class so transition fires
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        s.classList.add('visible');
+                        sh.classList.add('open');
+                    });
+                });
+                // Sync workspace label
+                const wsName = document.getElementById('ws-name-display');
+                const wsLabel = document.getElementById('mob-nav-ws-label');
+                const wsDot = document.getElementById('mob-nav-ws-dot');
+                const wsIndicator = document.getElementById('ws-color-indicator');
+                if (wsName && wsLabel) wsLabel.textContent = wsName.textContent;
+                if (wsIndicator && wsDot) wsDot.style.background = wsIndicator.style.background || 'rgb(var(--accent))';
+                // Sync active item
+                mobNavSyncActive(typeof currentApp !== 'undefined' ? currentApp : 'dashboard');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.mobNavSheetClose = function() {
+                const s = scrim(); const sh = sheet();
+                s.classList.remove('visible');
+                sh.classList.remove('open');
+                s.addEventListener('transitionend', () => { s.style.display = 'none'; }, { once: true });
+                document.body.style.overflow = '';
+            };
+
+            /* ── Navigate from sheet ── */
+            window.mobNavNavigate = function(appId) {
+                mobNavSheetClose();
+                switchApp(appId);
+            };
+
+            /* ── Sync active item highlight ── */
+            function mobNavSyncActive(appId) {
+                document.querySelectorAll('.mob-nav-item').forEach(el => {
+                    el.classList.toggle('mob-nav-active', el.dataset.app === appId);
+                });
+            }
+
+            /* ── Swipe-down-to-close on the handle & sheet ── */
+            let touchStartY = 0, touchCurY = 0, isDragging = false;
+            const CLOSE_THRESHOLD = 80; // px swipe down to dismiss
+
+            function onTouchStart(e) {
+                touchStartY = e.touches[0].clientY;
+                touchCurY = touchStartY;
+                isDragging = true;
+            }
+
+            function onTouchMove(e) {
+                if (!isDragging) return;
+                touchCurY = e.touches[0].clientY;
+                const dy = touchCurY - touchStartY;
+                if (dy > 0) {
+                    e.preventDefault();
+                    sheet().style.transform = `translateY(${dy}px)`;
+                }
+            }
+
+            function onTouchEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                const dy = touchCurY - touchStartY;
+                sheet().style.transform = ''; // reset inline override
+                if (dy > CLOSE_THRESHOLD) {
+                    mobNavSheetClose();
+                } else {
+                    // Snap back with a bounce
+                    sheet().style.transition = 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1)';
+                    setTimeout(() => { sheet().style.transition = ''; }, 220);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const sh = sheet();
+                const h  = handle();
+                if (!sh || !h) return;
+
+                // Drag on handle
+                h.addEventListener('touchstart',  onTouchStart, { passive: true });
+                h.addEventListener('touchmove',   onTouchMove,  { passive: false });
+                h.addEventListener('touchend',    onTouchEnd,   { passive: true });
+
+                // Drag on the sheet header area too
+                sh.addEventListener('touchstart',  onTouchStart, { passive: true });
+                sh.addEventListener('touchmove',   onTouchMove,  { passive: false });
+                sh.addEventListener('touchend',    onTouchEnd,   { passive: true });
+
+                // Sync active when switchApp is called
+                const _orig = window.switchApp;
+                if (_orig) {
+                    window.switchApp = function(appId) {
+                        _orig.call(this, appId);
+                        mobNavSyncActive(appId);
+                    };
+                }
+            });
+
+        })();
+
+        /* ══ NOTES OVERFLOW POPOVER ════════════════════════════════════ */
+        function noteOverflowToggle() {
+            const menu = document.getElementById('note-overflow-menu');
+            const btn  = document.getElementById('note-overflow-btn');
+            const isOpen = !menu.classList.contains('hidden');
+            if (isOpen) {
+                noteOverflowClose();
+            } else {
+                menu.classList.remove('hidden');
+                btn.setAttribute('aria-expanded', 'true');
+                // Close when tapping outside
+                setTimeout(() => {
+                    document.addEventListener('click', noteOverflowOutside, { once: true });
+                    document.addEventListener('touchstart', noteOverflowOutside, { once: true });
+                }, 0);
+            }
+        }
+        function noteOverflowClose() {
+            const menu = document.getElementById('note-overflow-menu');
+            const btn  = document.getElementById('note-overflow-btn');
+            if (menu) menu.classList.add('hidden');
+            if (btn)  btn.setAttribute('aria-expanded', 'false');
+        }
+        function noteOverflowOutside(e) {
+            const wrap = document.getElementById('note-overflow-wrap');
+            if (wrap && !wrap.contains(e.target)) noteOverflowClose();
+        }
+        /* ══ END NOTES OVERFLOW POPOVER ════════════════════════════════ */
+
+        /* ══ MOBILE BOTTOM NAV — Active State Controller ══ */
+        function mbnSetActive(clickedBtn) {
+            document.querySelectorAll('.mobile-bottom-nav__item')
+                .forEach(btn => btn.classList.remove('active'));
+            // Only add active class to non-home buttons (home has its own persistent pill style)
+            if (clickedBtn && !clickedBtn.classList.contains('mobile-bottom-nav__home')) {
+                clickedBtn.classList.add('active');
+            }
+        }
+        function mbnSyncToApp(appId) {
+            const target = document.querySelector(`.mobile-bottom-nav__item[data-app="${appId}"]`);
+            document.querySelectorAll('.mobile-bottom-nav__item')
+                .forEach(btn => btn.classList.remove('active'));
+            // Only highlight non-home targets
+            if (target && !target.classList.contains('mobile-bottom-nav__home')) {
+                target.classList.add('active');
+            }
+        }
+        (function patchSwitchApp() {
+            const _original = switchApp;
+            switchApp = function(appId) {
+                _original.call(this, appId);
+                mbnSyncToApp(appId);
+            };
+        })();
+        document.addEventListener('DOMContentLoaded', function() {
+            mbnSyncToApp(typeof currentApp !== 'undefined' ? currentApp : 'dashboard');
+        });
+
     </script>
+
+    <!-- ══ MOBILE BOTTOM NAVIGATION BAR ══ -->
+    <nav class="mobile-bottom-nav" role="navigation" aria-label="Mobile bottom navigation">
+      <button class="mobile-bottom-nav__item"
+        onclick="switchApp('notes'); mbnSetActive(this)"
+        data-app="notes" aria-label="Notes" type="button">
+        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="8" y1="13" x2="16" y2="13"/>
+          <line x1="8" y1="17" x2="12" y2="17"/>
+        </svg>
+        <span class="mobile-bottom-nav__label">Notes</span>
+      </button>
+      <button class="mobile-bottom-nav__item"
+        onclick="switchApp('kanban'); mbnSetActive(this)"
+        data-app="kanban" aria-label="Tasks" type="button">
+        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 11l3 3L22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        <span class="mobile-bottom-nav__label">Tasks</span>
+      </button>
+      <!-- HOME — centre FAB-style button -->
+      <button class="mobile-bottom-nav__item mobile-bottom-nav__home"
+        onclick="switchApp('dashboard'); mbnSetActive(this)"
+        data-app="dashboard" aria-label="Dashboard" type="button">
+        <div class="mobile-bottom-nav__home-pill">
+          <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </div>
+      </button>
+      <button class="mobile-bottom-nav__item"
+        onclick="switchApp('pomodoro'); mbnSetActive(this)"
+        data-app="pomodoro" aria-label="Focus timer" type="button">
+        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/>
+          <polyline points="12 7 12 12 15.5 12"/>
+        </svg>
+        <span class="mobile-bottom-nav__label">Focus</span>
+      </button>
+      <button class="mobile-bottom-nav__item"
+        onclick="mobNavSheetOpen()" 
+        id="mob-nav-more-btn"
+        aria-label="More navigation" type="button">
+        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+        </svg>
+        <span class="mobile-bottom-nav__label">More</span>
+      </button>
+    </nav>
+
+    <!-- ══ SWIPE-UP NAV SHEET ════════════════════════════════════════════ -->
+    <div id="mob-nav-scrim" onclick="mobNavSheetClose()" aria-hidden="true"></div>
+
+    <div id="mob-nav-sheet" role="dialog" aria-modal="true" aria-label="Navigation menu">
+
+      <!-- Drag handle — swipe down to close -->
+      <div id="mob-nav-sheet-handle" aria-hidden="true"></div>
+
+      <!-- Workspace row -->
+      <div id="mob-nav-ws-row">
+        <div id="mob-nav-ws-name">
+          <div id="mob-nav-ws-dot"></div>
+          <span id="mob-nav-ws-label">Workspace</span>
+        </div>
+        <button class="mob-nav-ws-btn" onclick="mobNavSheetClose(); setTimeout(toggleWorkspaceDropdown, 80);">Switch ▼</button>
+      </div>
+
+      <!-- All nav items -->
+      <div id="mob-nav-list">
+
+        <div class="mob-nav-section-label">Overview</div>
+        <div class="mob-nav-item" data-app="dashboard" onclick="mobNavNavigate('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </div>
+        <div class="mob-nav-item" data-app="graph" onclick="mobNavNavigate('graph')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/><line x1="5" y1="19" x2="19" y2="19"/></svg>
+          Graph
+        </div>
+        <div class="mob-nav-item" data-app="calendar" onclick="mobNavNavigate('calendar')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Calendar
+        </div>
+
+        <div class="mob-nav-section-label">Capture</div>
+        <div class="mob-nav-item" data-app="notes" onclick="mobNavNavigate('notes')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+          Notes
+        </div>
+        <div class="mob-nav-item" data-app="kanban" onclick="mobNavNavigate('kanban')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Tasks
+        </div>
+
+        <div class="mob-nav-section-label">Practice</div>
+        <div class="mob-nav-item" data-app="pomodoro" onclick="mobNavNavigate('pomodoro')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 12"/></svg>
+          Focus Timer
+        </div>
+        <div class="mob-nav-item" data-app="flashcards" onclick="mobNavNavigate('flashcards')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Mock Questions
+        </div>
+
+        <div class="mob-nav-section-label">Tools</div>
+        <div class="mob-nav-item" data-app="tutor" onclick="mobNavNavigate('tutor')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          AI Tutor
+        </div>
+        <div class="mob-nav-item" data-app="canvas" onclick="mobNavNavigate('canvas')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Whiteboard
+        </div>
+        <div class="mob-nav-item" data-app="soundscape" onclick="mobNavNavigate('soundscape')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          Sounds
+        </div>
+
+        <div class="mob-nav-section-label">Insights</div>
+        <div class="mob-nav-item" data-app="sessions" onclick="mobNavNavigate('sessions')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Sessions
+        </div>
+        <div class="mob-nav-item" data-app="settings" onclick="mobNavNavigate('settings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </div>
+
+      </div>
+
+      <!-- Footer actions -->
+      <div id="mob-nav-footer">
+        <button class="mob-nav-footer-btn" onclick="mobNavSheetClose(); setTimeout(toggleCmdPalette, 80);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 9 12 3 6 9"/><path d="M12 3v13"/><path d="M5 20h14"/></svg>
+          Command Palette
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ══ MOBILE BOTTOM NAV CSS ══ -->
+    <style>
+      .mobile-bottom-nav { display: none; }
+      @media (max-width: 767px) {
+        .mobile-bottom-nav {
+          display: flex; justify-content: space-around; align-items: stretch;
+          position: fixed; bottom: 0; left: 0; width: 100%; height: 62px;
+          z-index: 9900;
+          background: rgb(var(--bg-sidebar));
+          border-top: 1px solid rgb(var(--border-color));
+          backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+          padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .mobile-bottom-nav__item {
+          flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          gap: 4px; min-width: 44px; min-height: 44px; text-decoration: none;
+          border: none; background: transparent; cursor: pointer; padding: 0;
+          color: rgb(var(--text-muted)); transition: color 0.18s ease, background 0.18s ease;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .mobile-bottom-nav__item:active { background: rgba(var(--text-muted), 0.08); }
+        .mobile-bottom-nav__icon { width: 22px; height: 22px; flex-shrink: 0; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+        .mobile-bottom-nav__label { font-size: 10px; font-weight: 500; letter-spacing: 0.01em; line-height: 1; font-family: 'Inter', sans-serif; }
+        .mobile-bottom-nav__item.active { color: rgb(var(--accent)); }
+        .mobile-bottom-nav__item.active .mobile-bottom-nav__icon { transform: translateY(-2px) scale(1.1); filter: drop-shadow(0 0 6px rgba(var(--accent),0.5)); }
+        .mobile-bottom-nav__item.active .mobile-bottom-nav__label { font-weight: 700; }
+        /* Home centre pill */
+        .mobile-bottom-nav__home { position: relative; flex: 1.2; }
+        .mobile-bottom-nav__home-pill {
+          width: 48px; height: 48px;
+          border-radius: 16px;
+          background: rgb(var(--accent));
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: 2px;
+          box-shadow: 0 4px 14px rgba(var(--accent), 0.45);
+          transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease;
+        }
+        .mobile-bottom-nav__home-pill .mobile-bottom-nav__icon {
+          color: #fff; width: 22px; height: 22px;
+          filter: none !important; transform: none !important;
+        }
+        .mobile-bottom-nav__home:active .mobile-bottom-nav__home-pill {
+          transform: scale(0.93);
+          box-shadow: 0 2px 8px rgba(var(--accent), 0.3);
+        }
+        /* Home label always accent coloured */
+        .mobile-bottom-nav__home .mobile-bottom-nav__label { color: rgb(var(--accent)); font-weight: 700; }
+        /* Override generic active icon rules for home so the pill icon stays white */
+        .mobile-bottom-nav__home.active .mobile-bottom-nav__icon { transform: none; filter: none; }
+        main { padding-bottom: 62px !important; }
+        #toast-container { bottom: calc(62px + env(safe-area-inset-bottom,0px) + 12px) !important; }
+      }
+    </style>
 
 </body></html>
