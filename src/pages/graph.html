@@ -1,0 +1,61 @@
+<section id="app-graph" class="app-module hidden relative glass-bg">
+    <div class="absolute top-4 left-4 z-10 hidden md:block">
+        <p class="text-xs text-textMuted drop-shadow-md">Scroll to zoom · drag background to pan · drag nodes to reposition · right-click for options.</p>
+    </div>
+
+    <!-- Graph Force Controls -->
+    <div class="absolute bottom-4 left-4 glass-sidebar border border-borderDark p-4 rounded-xl shadow-xl z-40 text-xs w-64 hidden md:flex flex-col gap-3">
+        <div>
+            <label class="text-textMuted font-semibold mb-1 block">Link Distance</label>
+            <input type="range" id="graph-dist" min="30" max="200" value="100" class="crange w-full" onchange="renderKnowledgeGraph()">
+        </div>
+        <div>
+            <label class="text-textMuted font-semibold mb-1 block">Charge Strength</label>
+            <input type="range" id="graph-charge" min="-500" max="-10" value="-200" class="crange w-full" onchange="renderKnowledgeGraph()">
+        </div>
+        <div>
+            <label class="text-textMuted font-semibold mb-1 block">Collision Radius</label>
+            <input type="range" id="graph-collide" min="5" max="50" value="15" class="crange w-full" onchange="renderKnowledgeGraph()">
+        </div>
+        <div class="border-t border-borderDark pt-3">
+            <label class="text-textMuted font-semibold mb-1 block">Color By</label>
+            <div class="csel w-full" onclick="event.stopPropagation()">
+                <select id="graph-color-mode" class="hidden" onchange="renderKnowledgeGraph()">
+                    <option value="tag">First Tag</option>
+                    <option value="workspace">Workspace</option>
+                    <option value="degree">Connectivity</option>
+                    <option value="none">Accent</option>
+                </select>
+                <button id="graph-color-mode-btn" class="csel-btn w-full" onclick="cselToggle('graph-color-mode',event)">
+                    <span class="csel-label">First Tag</span>
+                    <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
+                </button>
+                <div id="graph-color-mode-dd" class="csel-dropdown">
+                    <div class="csel-option selected" data-val="tag"    onclick="cselChoose('graph-color-mode','tag','First Tag')">First Tag</div>
+                    <div class="csel-option"          data-val="workspace" onclick="cselChoose('graph-color-mode','workspace','Workspace')">Workspace</div>
+                    <div class="csel-option"          data-val="degree" onclick="cselChoose('graph-color-mode','degree','Connectivity')">Connectivity</div>
+                    <div class="csel-option"          data-val="none"   onclick="cselChoose('graph-color-mode','none','Accent')">Accent</div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <label class="text-textMuted font-semibold mb-1 block">Filter by Tag</label>
+            <input id="graph-tag-filter" type="text" placeholder="e.g. math, biology" oninput="renderKnowledgeGraph()" class="w-full bg-bgDark border border-borderDark rounded px-2 py-1 text-textMain outline-none focus:border-accent" />
+            <label class="ccheck mt-2">
+                <input id="graph-include-orphans" type="checkbox" checked onchange="renderKnowledgeGraph()">
+                <span class="ccheck-box"><svg class="ccheck-tick" width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="text-textMuted text-xs">Show orphan notes</span>
+            </label>
+        </div>
+        <div id="graph-legend" class="border-t border-borderDark pt-3 max-h-32 overflow-y-auto"></div>
+    </div>
+
+    <div id="d3-graph-container" class="w-full h-full cursor-move"></div>
+
+    <!-- Graph Context Menu -->
+    <div id="graph-context-menu" class="hidden absolute glass-sidebar border border-borderDark rounded-lg shadow-xl py-1 z-50 text-sm min-w-[150px]">
+        <div id="ctx-jump" class="px-4 py-3 md:py-2 hover:bg-black/20 cursor-pointer text-textMain">Jump to Note</div>
+        <div id="ctx-move" class="px-4 py-3 md:py-2 hover:bg-black/20 cursor-pointer text-accent border-t border-borderDark">Bridge Workspace</div>
+        <div id="ctx-delete" class="px-4 py-3 md:py-2 hover:bg-red-900/40 cursor-pointer text-red-400 border-t border-borderDark">Delete Note</div>
+    </div>
+</section>

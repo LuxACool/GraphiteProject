@@ -1,0 +1,342 @@
+<section id="app-settings" class="app-module hidden settings-root graphite-settings-v2" aria-label="Settings">
+  <div class="settings-shell">
+    <header class="settings-header">
+      <div>
+        <div class="settings-eyebrow">GRAPHITE</div>
+        <h2 class="settings-title">System Settings</h2>
+        <p class="settings-subtitle">Configure appearance, focus tools, AI, data, and shortcuts.</p>
+      </div>
+    </header>
+
+    <div class="settings-layout">
+      <nav id="settings-nav" class="settings-nav" aria-label="Settings sections">
+        <div class="settings-nav-section">
+          <div class="settings-nav-heading">Preferences</div>
+          <div class="settings-nav-list">
+            <button type="button" data-settings-tab="appearance" data-settings-label="Appearance" class="settings-tab-btn"><span class="settings-row-icon">•</span><span>Appearance</span><span class="settings-chevron">›</span></button>
+            <button type="button" data-settings-tab="notifications" data-settings-label="Notifications" class="settings-tab-btn"><span class="settings-row-icon">•</span><span>Notifications</span><span class="settings-chevron">›</span></button>
+            <button type="button" data-settings-tab="focus" data-settings-label="Focus &amp; Tools" class="settings-tab-btn"><span class="settings-row-icon">•</span><span>Focus &amp; Tools</span><span class="settings-chevron">›</span></button>
+          </div>
+        </div>
+        <div class="settings-nav-section">
+          <div class="settings-nav-heading">Intelligence &amp; Data</div>
+          <div class="settings-nav-list">
+            <button type="button" data-settings-tab="ai" data-settings-label="AI Tutor" class="settings-tab-btn"><span class="settings-row-icon">✦</span><span>AI Tutor</span><span class="settings-chevron">›</span></button>
+            <button type="button" data-settings-tab="data" data-settings-label="Data" class="settings-tab-btn"><span class="settings-row-icon">•</span><span>Data</span><span class="settings-chevron">›</span></button>
+          </div>
+        </div>
+        <div class="settings-nav-section">
+          <div class="settings-nav-heading">Help &amp; Info</div>
+          <div class="settings-nav-list">
+            <button type="button" data-settings-tab="shortcuts" data-settings-label="Shortcuts" class="settings-tab-btn"><span class="settings-row-icon">•</span><span>Shortcuts</span><span class="settings-chevron">›</span></button>
+            <button type="button" data-settings-tab="about" data-settings-label="About" class="settings-tab-btn"><span class="settings-row-icon">♡</span><span>About</span><span class="settings-chevron">›</span></button>
+          </div>
+        </div>
+      </nav>
+
+      <div id="settings-panels-wrap" class="settings-panels">
+        <div id="settings-mobile-topbar" class="settings-mobile-topbar">
+          <button type="button" id="settings-back-btn" class="settings-back-btn"><span aria-hidden="true">‹</span> Settings</button>
+          <h3 id="settings-mobile-title"></h3>
+        </div>
+
+                <!-- APPEARANCE -->
+                <div data-settings-panel="appearance" class="settings-panel space-y-5">
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between gap-4 flex-wrap">
+                            <div>
+                                <h3 class="text-sm font-semibold text-textMain mb-1" data-i18n="Language">Language</h3>
+                                <p class="text-xs text-textMuted" data-i18n="Language changes the Graphite interface. Your notes and personal content are not translated.">Language changes the Graphite interface. Your notes and personal content are not translated.</p>
+                            </div>
+                            <div class="language-picker" id="language-picker">
+                                <button id="language-select-trigger" type="button" class="language-picker-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="English">
+                                    <span data-language-label>English</span>
+                                    <span class="language-picker-chevron" aria-hidden="true">⌄</span>
+                                </button>
+                                <div id="language-select-menu" class="language-picker-menu" role="listbox" aria-label="Language">
+                                    <button type="button" class="language-option" data-language-option="en" role="option" aria-selected="false"><span>English</span><span data-language-check></span></button>
+                                    <button type="button" class="language-option" data-language-option="id" role="option" aria-selected="false"><span>Bahasa Indonesia</span><span data-language-check></span></button>
+                                    <button type="button" class="language-option" data-language-option="ja" role="option" aria-selected="false"><span>日本語</span><span data-language-check></span></button>
+                                    <button type="button" class="language-option" data-language-option="de" role="option" aria-selected="false"><span>Deutsch</span><span data-language-check></span></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-[11px] text-textMuted mt-2" id="language-current-label">English</div>
+                    </div>
+                    <!-- Wallpaper & Glass -->
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-textMain mb-1">Wallpaper & Glass</h3>
+                        <p class="text-xs text-textMuted mb-4">Custom background and frosted-glass intensity.</p>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs text-textMuted block mb-2">Wallpaper (Image or Video)</label>
+                                <div class="space-y-2">
+                                    <input type="text" id="wp-url" onchange="updateWallpaperUrl(this.value)" placeholder="https://... (URL)" class="w-full bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent">
+                                    <div class="flex items-center gap-3 flex-wrap">
+                                        <span class="text-[10px] text-textMuted">or</span>
+                                        <button onclick="document.getElementById('wp-local-file').click()" class="px-3 py-1.5 bg-accent/10 text-accent border border-accent/20 rounded-lg text-xs font-semibold hover:bg-accent/20 transition">📁 Upload Local File</button>
+                                        <input type="file" id="wp-local-file" accept="image/*,video/mp4,video/webm" class="hidden" onchange="loadLocalWallpaper(event)">
+                                        <button onclick="clearWallpaper()" class="text-xs text-textMuted hover:text-red-400 transition">✕ Clear</button>
+                                    </div>
+                                    <div id="wp-current-label" class="text-[10px] text-textMuted italic"></div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs text-textMuted block mb-1">Glass Opacity</label>
+                                    <input type="range" min="0.1" max="1" step="0.05" id="glass-opacity" onchange="updateGlassOpacity(this.value)" class="crange w-full cursor-pointer">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-textMuted block mb-1">Glass Blur</label>
+                                    <input type="range" min="0" max="40" step="1" id="glass-blur" onchange="updateGlassBlur(this.value)" class="crange w-full cursor-pointer">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-textMuted block mb-1">Ambient Soundscape</label>
+                                <div class="csel w-full" onclick="event.stopPropagation()">
+                                    <select id="ambient-sound" class="hidden" onchange="updateAmbient(this.value)">
+                                        <option value="none">None</option>
+                                        <option value="rain">Light Rain</option>
+                                        <option value="fire">Crackling Fireplace</option>
+                                        <option value="cafe">Cafe Murmur</option>
+                                        <option value="forest">Forest Birds</option>
+                                    </select>
+                                    <button id="ambient-sound-btn" class="csel-btn lg w-full" onclick="cselToggle('ambient-sound',event)">
+                                        <span class="csel-label">None</span>
+                                        <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
+                                    </button>
+                                    <div id="ambient-sound-dd" class="csel-dropdown">
+                                        <div class="csel-option selected" data-val="none"   onclick="cselChoose('ambient-sound','none','None')">None</div>
+                                        <div class="csel-option"          data-val="rain"   onclick="cselChoose('ambient-sound','rain','Light Rain')">Light Rain</div>
+                                        <div class="csel-option"          data-val="fire"   onclick="cselChoose('ambient-sound','fire','Crackling Fireplace')">Crackling Fireplace</div>
+                                        <div class="csel-option"          data-val="cafe"   onclick="cselChoose('ambient-sound','cafe','Cafe Murmur')">Cafe Murmur</div>
+                                        <div class="csel-option"          data-val="forest" onclick="cselChoose('ambient-sound','forest','Forest Birds')">Forest Birds</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Base Theme + Accent -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                        <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                            <h3 class="text-sm font-semibold text-textMain mb-3">Base Theme</h3>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <label class="cradio flex-1 p-3 border border-borderDark rounded-lg hover:bg-black/10 transition cursor-pointer text-sm text-textMain">
+                                    <input type="radio" name="theme" value="dark" id="theme-dark" onchange="updateTheme(this.value)">
+                                    <span class="cradio-disc"></span>
+                                    Dark Base
+                                </label>
+                                <label class="cradio flex-1 p-3 border border-borderDark rounded-lg hover:bg-black/10 transition cursor-pointer text-sm text-textMain">
+                                    <input type="radio" name="theme" value="light" id="theme-light" onchange="updateTheme(this.value)">
+                                    <span class="cradio-disc"></span>
+                                    Light Base
+                                </label>
+                            </div>
+                        </div>
+                        <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                            <h3 class="text-sm font-semibold text-textMain mb-3">Accent Color</h3>
+                            <div class="flex items-center gap-4 bg-bgDark p-3 rounded-lg border border-borderDark shadow-sm">
+                                <label class="ccolor" title="Pick accent color">
+                                    <span id="accent-picker-swatch" class="ccolor-swatch" style="width:36px;height:36px;border-radius:10px;background:#8b5cf6"></span>
+                                    <input type="color" id="accent-picker" onchange="updateAccent(this.value); document.getElementById('accent-picker-swatch').style.background=this.value">
+                                </label>
+                                <span class="text-sm font-mono text-textMuted font-bold" id="accent-hex-display"></span>
+                            </div>
+                            <div class="flex flex-wrap gap-3 mt-4">
+                                <button onclick="setPresetAccent('#8b5cf6')" class="w-8 h-8 rounded-full bg-[#8b5cf6] border-2 border-borderDark hover:scale-110 transition shadow-sm"></button>
+                                <button onclick="setPresetAccent('#3b82f6')" class="w-8 h-8 rounded-full bg-[#3b82f6] border-2 border-borderDark hover:scale-110 transition shadow-sm"></button>
+                                <button onclick="setPresetAccent('#10b981')" class="w-8 h-8 rounded-full bg-[#10b981] border-2 border-borderDark hover:scale-110 transition shadow-sm"></button>
+                                <button onclick="setPresetAccent('#f43f5e')" class="w-8 h-8 rounded-full bg-[#f43f5e] border-2 border-borderDark hover:scale-110 transition shadow-sm"></button>
+                                <button onclick="setPresetAccent('#f59e0b')" class="w-8 h-8 rounded-full bg-[#f59e0b] border-2 border-borderDark hover:scale-110 transition shadow-sm"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Theme / Color Palette Picker -->
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between gap-4 flex-wrap mb-3">
+                            <div>
+                                <h3 class="text-sm font-semibold text-textMain mb-1" data-i18n="Theme Presets">Theme Presets</h3>
+                                <p class="text-xs text-textMuted" data-i18n="One-click curated palettes.">One-click curated palettes.</p>
+                            </div>
+                            <span class="palette-count-badge" id="palette-result-count">103 palettes</span>
+                        </div>
+                        <div id="theme-palette-grid" class="theme-palette-grid" role="listbox" aria-label="Color palettes"></div>
+                        <div class="theme-palette-pagination" aria-label="Palette pages">
+                            <button id="palette-prev" type="button" class="theme-palette-page-btn" aria-label="Previous palette page">‹</button>
+                            <span id="palette-page-label" class="theme-palette-page-label">1 / 7</span>
+                            <button id="palette-next" type="button" class="theme-palette-page-btn" aria-label="Next palette page">›</button>
+                        </div>
+                    </div>
+
+                        <div class="mt-4 p-4 rounded-lg border border-borderDark bg-black/10">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-xs font-semibold text-textMain">Custom Themes</h4>
+                                <button onclick="applyPreset('custom')" class="text-[11px] px-2 py-1 rounded-md border border-borderDark hover:border-accent text-textMuted hover:text-textMain">Apply</button>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-[11px] text-textMuted">
+                                <label class="flex items-center justify-between gap-2">Background
+                                    <label class="ccolor"><span class="ccolor-swatch" style="width:26px;height:26px;background:#121212"></span><input type="color" value="#121212" oninput="setCustomThemeColor('bg-main', this.value); this.previousElementSibling.style.background=this.value"></label>
+                                </label>
+                                <label class="flex items-center justify-between gap-2">Sidebar
+                                    <label class="ccolor"><span class="ccolor-swatch" style="width:26px;height:26px;background:#181818"></span><input type="color" value="#181818" oninput="setCustomThemeColor('bg-sidebar', this.value); this.previousElementSibling.style.background=this.value"></label>
+                                </label>
+                                <label class="flex items-center justify-between gap-2">Border
+                                    <label class="ccolor"><span class="ccolor-swatch" style="width:26px;height:26px;background:#2a2a2a"></span><input type="color" value="#2a2a2a" oninput="setCustomThemeColor('border', this.value); this.previousElementSibling.style.background=this.value"></label>
+                                </label>
+                                <label class="flex items-center justify-between gap-2">Accent
+                                    <label class="ccolor"><span class="ccolor-swatch" style="width:26px;height:26px;background:#8b5cf6"></span><input type="color" value="#8b5cf6" oninput="setCustomThemeColor('accent', this.value); this.previousElementSibling.style.background=this.value"></label>
+                                </label>
+                                <label class="flex items-center justify-between gap-2">Text
+                                    <label class="ccolor"><span class="ccolor-swatch" style="width:26px;height:26px;background:#e5e5e5"></span><input type="color" value="#e5e5e5" oninput="setCustomThemeColor('text-main', this.value); this.previousElementSibling.style.background=this.value"></label>
+                                </label>
+                                <label class="flex items-center justify-between gap-2">Muted
+                                    <label class="ccolor"><span class="ccolor-swatch" style="width:26px;height:26px;background:#8b8b8b"></span><input type="color" value="#8b8b8b" oninput="setCustomThemeColor('text-muted', this.value); this.previousElementSibling.style.background=this.value"></label>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOCUS & TOOLS -->
+                <div data-settings-panel="focus" class="settings-panel hidden space-y-5">
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-textMain mb-1">Focus Guard Blocklist</h3>
+                        <p class="text-xs text-textMuted mb-4">Simulated blocklist shown when Deep Work is active.</p>
+                        <input type="text" id="setting-blocklist" onchange="updateBlocklist(this.value)" placeholder="reddit.com, twitter.com" class="w-full bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent">
+                    </div>
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-textMain mb-1">Whiteboard Hover-Draw Hotkey</h3>
+                        <p class="text-xs text-textMuted mb-3">Hold this key on the whiteboard with the ✏️ Draw tool to draw freely — no click-and-drag needed.</p>
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <input type="text" id="setting-hover-draw-key" maxlength="1" placeholder="f" oninput="updateHoverDrawKey(this.value)" class="w-16 text-center bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent font-mono uppercase" />
+                            <span class="text-xs text-textMuted">Single character key (e.g. <kbd>F</kbd>, <kbd>H</kbd>, <kbd>Q</kbd>)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI -->
+                <div data-settings-panel="ai" class="settings-panel hidden space-y-5">
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-textMain mb-1">AI Tutor Settings</h3>
+                        <p class="text-xs text-textMuted mb-3">Choose your AI provider. Free Pollinations.ai is used when no key is set. Add an API key for higher quality responses.</p>
+                        <label class="text-xs text-textMuted block mb-1 mt-2">AI Provider</label>
+                        <div class="csel w-full mb-3" onclick="event.stopPropagation()">
+                            <select id="setting-ai-provider" class="hidden" onchange="updateAiProvider(this.value)">
+                                <option value="free">Free (Pollinations.ai — no key needed)</option>
+                                <option value="openai">🤖 OpenAI (ChatGPT — gpt-4o-mini)</option>
+                                <option value="claude">🟣 Anthropic (Claude — claude-haiku-4-5-20251001)</option>
+                                <option value="gemini">🔵 Google (Gemini — gemini-1.5-flash)</option>
+                                <option value="custom">⚙️ Custom (OpenAI-compatible endpoint)</option>
+                            </select>
+                            <button id="setting-ai-provider-btn" class="csel-btn lg w-full" onclick="cselToggle('setting-ai-provider',event)">
+                                <span class="csel-label">🆓 Free (Pollinations.ai — no key needed)</span>
+                                <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
+                            </button>
+                            <div id="setting-ai-provider-dd" class="csel-dropdown">
+                                <div class="csel-option selected" data-val="free"   onclick="cselChoose('setting-ai-provider','free','🆓 Free (Pollinations.ai — no key needed)')">🆓 Free (Pollinations.ai — no key needed)</div>
+                                <div class="csel-option"          data-val="openai" onclick="cselChoose('setting-ai-provider','openai','🤖 OpenAI (ChatGPT — gpt-4o-mini)')">🤖 OpenAI (ChatGPT — gpt-4o-mini)</div>
+                                <div class="csel-option"          data-val="claude" onclick="cselChoose('setting-ai-provider','claude','🟣 Anthropic (Claude — claude-haiku-4-5-20251001)')">🟣 Anthropic (Claude)</div>
+                                <div class="csel-option"          data-val="gemini" onclick="cselChoose('setting-ai-provider','gemini','🔵 Google (Gemini — gemini-1.5-flash)')">🔵 Google (Gemini)</div>
+                                <div class="csel-option"          data-val="custom" onclick="cselChoose('setting-ai-provider','custom','⚙️ Custom (OpenAI-compatible endpoint)')">⚙️ Custom endpoint</div>
+                            </div>
+                        </div>
+                        <div id="ai-key-block" class="space-y-2">
+                            <input type="password" id="setting-openai-key" placeholder="Paste your API key here..." onchange="state.settings.openaiKey=this.value; saveDataToDB();" class="w-full bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent">
+                            <div id="ai-custom-base-block" class="hidden">
+                                <input type="text" id="setting-openai-base" placeholder="https://api.openai.com/v1 (base URL for custom endpoint)" onchange="state.settings.openaiBase=this.value; saveDataToDB();" class="w-full bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent">
+                            </div>
+                        </div>
+                        <div id="ai-provider-hint" class="mt-2 text-[11px] text-textMuted italic leading-relaxed"></div>
+                    </div>
+                </div>
+
+                <!-- DATA -->
+                <div data-settings-panel="data" class="settings-panel hidden space-y-5">
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-textMain mb-1">Data Management</h3>
+                        <p class="text-xs text-textMuted mb-4">Export all Graphite app data, preferences, study content, and workspace state to a portable backup, or sync markdown notes to your hard drive.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <button onclick="exportVault()" class="px-4 py-2.5 bg-accent/20 text-accent font-semibold border border-accent/30 rounded-lg hover:bg-accent/30 transition text-sm text-center shadow-sm">Export Graphite Backup (.json)</button>
+                            <button onclick="syncToFolder()" class="px-4 py-2.5 bg-mint/20 text-mint font-semibold border border-mint/30 rounded-lg hover:bg-mint/30 transition text-sm text-center shadow-sm">Sync Notes to Folder</button>
+                            <button onclick="document.getElementById('import-vault').click()" class="px-4 py-2.5 bg-bgDark text-textMain border border-borderDark rounded-lg hover:bg-black/20 transition text-sm text-center shadow-sm">Import Graphite Backup</button>
+                            <input type="file" id="import-vault" accept=".json" class="hidden" onchange="importVault(event)">
+                        </div>
+                    </div>
+                    <div class="border border-red-500/30 rounded-xl p-5 shadow-sm bg-red-500/5">
+                        <h3 class="text-sm font-semibold text-red-400 mb-1">⚠ Danger Zone</h3>
+                        <p class="text-xs text-textMuted mb-4">Permanently delete all data. This cannot be undone.</p>
+                        <button onclick="hardReset()" class="px-4 py-2 bg-red-500/10 text-red-400 font-semibold border border-red-500/30 rounded-lg hover:bg-red-500/20 hover:border-red-400 transition text-sm">Wipe All Data</button>
+                    </div>
+                </div>
+
+                <!-- SHORTCUTS -->
+                <div data-settings-panel="shortcuts" class="settings-panel hidden space-y-5">
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-textMain mb-1">Keyboard Shortcuts</h3>
+                        <p class="text-xs text-textMuted" style="text-align: left; margin-bottom: 16px;">Press <kbd class="font-mono">?</kbd> anywhere to show the overlay.</p>
+                        <p class="text-xs text-textMuted" style="text-align: right; margin-bottom: 4px;">You can't change the keys lol</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Open Command Palette</span><kbd class="text-accent font-mono">Ctrl+K</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">New Note</span><kbd class="text-accent font-mono">Alt+N</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Start/Stop Timer</span><kbd class="text-accent font-mono">Alt+T</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Save Manually</span><kbd class="text-accent font-mono">Ctrl+S</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Bold / Italic</span><kbd class="text-accent font-mono">Ctrl+B/I</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Undo / Redo</span><kbd class="text-accent font-mono">Ctrl+Z/Y</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Dashboard</span><kbd class="text-accent font-mono">Ctrl+D</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Toggle Sidebar</span><kbd class="text-accent font-mono">Ctrl+/</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">AI Tutor</span><kbd class="text-accent font-mono">Ctrl+T</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Journal</span><kbd class="text-accent font-mono">Ctrl+J</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark sm:col-span-2"><span class="text-textMuted">Whiteboard Hover-Draw (hold)</span><kbd id="shortcuts-hover-draw-key" class="text-accent font-mono">F</kbd></div>
+                        </div>
+                    </div>
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-textMain mb-1">Whiteboard Tools</h3>
+                        <p class="text-xs text-textMuted mb-4">Number keys 1–9 swap tools instantly while on the whiteboard.</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Pan</span><kbd class="text-accent font-mono">1</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Draw</span><kbd class="text-accent font-mono">2</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Rectangle</span><kbd class="text-accent font-mono">3</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Circle</span><kbd class="text-accent font-mono">4</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Line</span><kbd class="text-accent font-mono">5</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Text</span><kbd class="text-accent font-mono">6</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Sticky Note</span><kbd class="text-accent font-mono">7</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Eraser</span><kbd class="text-accent font-mono">8</kbd></div>
+                            <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Fill</span><kbd class="text-accent font-mono">9</kbd></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-settings-panel="about" class="settings-panel hidden space-y-5">
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-8 shadow-sm flex flex-col items-center text-center gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-textMain mb-1">Graphite</h2>
+                            <p class="text-xs text-textMuted">pretty cool study app</p>
+                        </div>
+                        <div class="w-12 border-t border-borderDark"></div>
+                        <div class="space-y-1">
+                            <p class="text-xs text-textMuted uppercase tracking-widest font-semibold">Designed &amp; Built by</p>
+                            <p class="text-base font-semibold text-textMain">Dzaki Ma'arif</p>
+                            <a href="https://instagram.com/tofyouu_" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border border-borderDark hover:border-accent hover:text-accent transition-colors"
+                               style="color: rgb(var(--text-muted)); text-decoration: none; margin-top: 4px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                                @tofyouu_
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTIFICATIONS -->
+                <div data-settings-panel="notifications" class="settings-panel space-y-5 hidden">
+                    <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-textMain mb-1">Notification Preferences</h3>
+                        <p class="text-xs text-textMuted mb-2">I don't even know if this stupid feature works, f#ck around and find out i guess</p>
+                        <div id="notif-prefs-body"><!-- rendered by NotifSystem.renderPanel() --></div>
+                    </div>
+                </div>
+      </div>
+    </div>
+  </div>
+</section>

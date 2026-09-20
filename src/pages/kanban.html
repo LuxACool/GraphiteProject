@@ -1,0 +1,20 @@
+<section id="app-kanban" class="app-module hidden p-4 md:p-8 flex flex-col h-full">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl md:text-2xl font-bold text-textMain drop-shadow-sm">Task Board</h2>
+        <button onclick="addKanbanTask()" class="px-4 py-2 md:py-1.5 glass-sidebar border border-borderDark text-textMain text-sm font-medium rounded-lg hover:bg-black/20">+ Add Task</button>
+    </div>
+    <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 overflow-y-auto md:overflow-hidden pb-20 md:pb-10">
+        <div class="glass-sidebar border border-borderDark p-2.5 md:p-4 rounded-xl flex flex-col min-h-[180px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'todo', this)">
+            <h3 class="text-[11px] font-bold tracking-wider uppercase mb-2 md:mb-3 text-textMuted flex justify-between">To Do <span id="count-todo">0</span></h3>
+            <div id="kb-todo" class="flex-1 space-y-2 overflow-y-auto pr-1"></div>
+        </div>
+        <div class="glass-sidebar border border-borderDark p-2.5 md:p-4 rounded-xl flex flex-col min-h-[180px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'progress', this)">
+            <h3 class="text-[11px] font-bold tracking-wider uppercase mb-2 md:mb-3 text-accent flex justify-between">In Progress <span id="count-progress">0</span></h3>
+            <div id="kb-progress" class="flex-1 space-y-2 overflow-y-auto pr-1"></div>
+        </div>
+        <div class="glass-sidebar border border-borderDark p-2.5 md:p-4 rounded-xl flex flex-col min-h-[180px] md:min-h-0 kb-col" ondragover="allowDrop(event,this)" ondragleave="leaveDrop(this)" ondrop="dropCard(event, 'done', this)">
+            <h3 class="text-[11px] font-bold tracking-wider uppercase mb-2 md:mb-3 text-mint flex justify-between">Done <span id="count-done">0</span></h3>
+            <div id="kb-done" class="flex-1 space-y-2 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+</section>

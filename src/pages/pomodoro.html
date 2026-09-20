@@ -1,0 +1,75 @@
+<section id="app-pomodoro" class="app-module hidden p-4 md:p-8 flex items-center justify-center min-h-full overflow-y-auto">
+    <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 items-center justify-center my-auto">
+
+        <!-- Main Timer Workspace (Left Column) -->
+        <div class="md:col-span-7 lg:col-span-8 flex flex-col items-center justify-center w-full">
+
+            <!-- Mode Switches -->
+            <div class="flex items-center gap-1 p-1.5 glass-sidebar rounded-2xl border border-borderDark mb-6 bg-bgDark/50">
+                <button onclick="setTimerPreset(25,'work')" id="preset-btn-25" class="preset-btn pomo-preset-active px-5 py-2 text-xs md:text-sm rounded-xl font-medium transition-all duration-200 text-textMain hover:bg-white/5">Pomodoro</button>
+                <button onclick="setTimerPreset(5,'short')" id="preset-btn-5" class="preset-btn px-5 py-2 text-xs md:text-sm rounded-xl font-medium transition-all duration-200 text-textMuted hover:bg-white/5">Short Break</button>
+                <button onclick="setTimerPreset(15,'long')" id="preset-btn-15" class="preset-btn px-5 py-2 text-xs md:text-sm rounded-xl font-medium transition-all duration-200 text-textMuted hover:bg-white/5">Long Break</button>
+            </div>
+
+            <!-- Task Context -->
+            <div class="w-full max-w-md mb-6 text-center">
+                <label for="active-goal-input" class="text-[10px] text-textMuted uppercase tracking-widest block mb-1.5">Focusing On</label>
+                <input type="text" id="active-goal-input" placeholder="Select or type your active goal..." class="w-full text-center text-sm md:text-base font-medium text-accent bg-bgDark/60 border border-borderDark rounded-xl px-4 py-2.5 outline-none focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner">
+            </div>
+
+            <!-- Animated Timer Ring Display -->
+            <div id="timer-ring-container" class="timer-circle-wrap relative w-72 h-72 md:w-80 md:h-80 flex items-center justify-center">
+                <svg id="pomo-svg" width="100%" height="100%" viewBox="0 0 256 256" class="-rotate-90 transform origin-center">
+                    <circle cx="128" cy="128" r="112" fill="none" stroke-width="8" class="pomo-ring-track opacity-20 stroke-current text-borderDark"/>
+                    <circle id="pomo-ring-fill" cx="128" cy="128" r="112" fill="none" stroke-width="8"
+                        stroke-linecap="round"
+                        stroke-dasharray="703.7" stroke-dashoffset="0"
+                        class="pomo-ring-fill stroke-accent transition-all duration-1000 ease-linear drop-shadow-[0_0_12px_rgba(244,63,94,0.4)]"/>
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center pointer-events-none">
+                    <div class="text-5xl md:text-6xl font-light tracking-tight text-textMain drop-shadow-lg font-mono" id="timer-display">25:00</div>
+                    <div id="pomo-mode-label" class="text-xs text-textMuted uppercase tracking-widest mt-2">Work</div>
+                </div>
+            </div>
+
+            <!-- Session Dots -->
+            <div id="pomo-dots" class="flex gap-2 mt-4"></div>
+
+            <!-- Primary Action CTA Controls -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6 w-full max-w-xs">
+                <button id="pomo-start-btn" onclick="startTimer()" class="w-full px-10 py-3 bg-accent text-white font-bold text-base rounded-xl hover:bg-accent/90 transition transform active:scale-95 shadow-lg shadow-accent/25">
+                    Start Focus
+                </button>
+
+                <div id="pomo-secondary-controls" class="hidden flex gap-2 w-full">
+                    <button onclick="pauseTimer()" class="flex-1 px-4 py-3 glass-sidebar border border-borderDark text-textMain rounded-xl hover:bg-white/5 transition text-sm font-medium">Pause</button>
+                    <button onclick="resetTimer()" class="flex-1 px-4 py-3 glass-sidebar border border-borderDark text-textMain rounded-xl hover:bg-white/5 transition text-sm font-medium">Reset</button>
+                </div>
+            </div>
+
+            <!-- Custom Duration Input -->
+            <div class="flex items-center gap-2 mt-4 text-xs text-textMuted">
+                <span>Custom duration:</span>
+                <input type="number" id="custom-timer-input" min="1" max="180" placeholder="min" class="w-14 bg-bgDark border border-borderDark rounded-lg px-2 py-1 text-textMain outline-none focus:border-accent text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"/>
+                <button onclick="applyCustomTimer()" class="px-2.5 py-1 bg-accent/15 text-accent border border-accent/25 rounded-lg hover:bg-accent/25 transition font-semibold">Set</button>
+            </div>
+        </div> <!-- End Main Workspace Column -->
+
+        <!-- Right Sidebar Panel (Right Column) -->
+        <div class="md:col-span-5 lg:col-span-4 w-full flex flex-col gap-6 glass-sidebar border border-borderDark p-6 rounded-2xl bg-bgDark/30">
+            <div>
+                <h3 class="text-xs font-semibold text-textMuted uppercase tracking-wider mb-4">Session Details</h3>
+                <label class="text-[10px] text-textMuted uppercase tracking-wider block mb-1.5">Tag Subject</label>
+                <input type="text" id="pomo-subject" placeholder="e.g. Calculus, Biology..." class="w-full bg-bgDark border border-borderDark rounded-xl px-3.5 py-2.5 text-sm text-textMain outline-none focus:border-accent transition">
+            </div>
+
+            <div class="pt-4 border-t border-borderDark/60">
+                <div class="text-[10px] text-textMuted uppercase tracking-wider mb-3">Today's Focus Log</div>
+                <div id="pomo-recent-sessions" class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs text-textMuted italic">
+                    No sessions yet.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

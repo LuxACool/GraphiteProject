@@ -1,0 +1,142 @@
+<!-- Calendar Main View (Matches original app wiring exactly) -->
+<section id="app-calendar" class="app-module hidden p-3 md:p-8 overflow-y-auto min-h-full">
+    <div class="max-w-6xl mx-auto w-full pb-10">
+        
+        <!-- Header & Control Toolbar -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div class="flex flex-wrap items-center gap-3">
+                <h2 class="text-xl md:text-2xl font-bold text-textMain drop-shadow-sm">Time Blocks</h2>
+                <div id="cal-overload-badge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-500/15 border border-red-500/30 text-red-400 animate-pulse">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    <span>Focus Limit Exceeded (>8h)</span>
+                </div>
+                <div id="cal-conflict-badge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-400">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Time Overlaps Detected</span>
+                </div>
+            </div>
+
+            <!-- Toolbar Navigation & Actions -->
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="flex items-center glass-sidebar border border-borderDark rounded-lg p-0.5 shadow-sm">
+                    <button id="cal-prev-btn" type="button" aria-label="Previous Day" class="relative z-10 px-3 py-1.5 rounded-md text-textMuted hover:text-textMain hover:bg-white/5 transition text-sm font-bold">‹</button>
+                    <button id="cal-today-btn" type="button" aria-label="Today" class="relative z-10 px-3 py-1.5 rounded-md text-textMuted hover:text-textMain hover:bg-white/5 transition text-xs font-semibold uppercase tracking-wider">Today</button>
+                    <button id="cal-next-btn" type="button" aria-label="Next Day" class="relative z-10 px-3 py-1.5 rounded-md text-textMuted hover:text-textMain hover:bg-white/5 transition text-sm font-bold cursor-pointer">›</button>
+                </div>
+                
+                <input id="cal-date-input" type="date" class="px-3 py-1.5 rounded-lg border border-borderDark bg-bgDark/80 text-textMain text-sm outline-none focus:border-accent transition shadow-inner relative z-10" />
+                
+                <button id="cal-new-block-btn" type="button" class="relative z-10 flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-accent text-white text-sm font-semibold hover:opacity-90 active:scale-95 transition shadow-lg shadow-accent/20">
+                    <span>+</span> Block
+                </button>
+            </div>
+        </div>
+
+        <!-- Date Banner Label -->
+        <div class="flex items-center justify-between mb-3 text-sm text-textMuted font-medium">
+            <div id="cal-date-label" class="text-textMain font-semibold text-base"></div>
+            <div id="cal-summary-stats" class="text-xs font-mono">0h 0m scheduled</div>
+        </div>
+
+        <!-- Main Grid Scroll Container -->
+        <div id="cal-grid-scroll-container" class="border border-borderDark rounded-2xl overflow-y-auto glass-sidebar shadow-xl relative h-[720px] scroll-smooth">
+            <div class="relative min-w-[320px] h-[1440px] flex select-none">
+                
+                <!-- Sticky Left Time Axis (00:00 to 23:00) -->
+                <div class="sticky left-0 top-0 z-20 w-16 md:w-20 shrink-0 bg-bgDark/90 backdrop-blur-md border-r border-borderDark/60 flex flex-col select-none">
+                    <div id="cal-time-axis" class="w-full h-full flex flex-col"></div>
+                </div>
+
+                <!-- Main Time Grid Canvas -->
+                <div id="calendar-grid" class="relative flex-1 h-[1440px] bg-bgDark/30 cursor-pointer">
+                    <!-- Horizontal Background Grid Lines -->
+                    <div id="cal-grid-lines" class="absolute inset-0 pointer-events-none"></div>
+
+                    <!-- Live Time Line Indicator -->
+                    <div id="cal-live-indicator" class="absolute left-0 right-0 z-30 pointer-events-none hidden flex items-center">
+                        <div class="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+                        <div class="h-[2px] w-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]"></div>
+                        <span id="cal-live-time-label" class="absolute right-2 -top-3 text-[10px] font-mono font-bold bg-red-500 text-white px-1.5 py-0.5 rounded shadow"></span>
+                    </div>
+
+                    <!-- Rendered Interactive Time Blocks Container -->
+                    <div id="cal-blocks-layer" class="absolute inset-0 z-10"></div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-[11px] text-textMuted mt-3 flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-accent"></span>
+            <span>Click any empty slot to create a block · Drag to move · Drag bottom edge to resize · 15-minute grid snap.</span>
+        </p>
+    </div>
+</section>
+
+<!-- Block Editor / Modal Dialog -->
+<div id="cal-modal" class="fixed inset-0 z-[9960] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="glass-sidebar border border-borderDark rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all flex flex-col max-h-[90vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-borderDark mb-4">
+            <h3 id="cal-modal-title" class="text-lg font-bold text-textMain">New Time Block</h3>
+            <button id="cal-modal-close-1" type="button" aria-label="Close modal" class="text-textMuted hover:text-textMain text-xl font-bold px-2">✕</button>
+        </div>
+
+        <form id="cal-form" class="space-y-4 overflow-y-auto pr-1">
+            <input type="hidden" id="cal-block-id" value="" />
+            
+            <div>
+                <label class="block text-xs font-semibold text-textMuted uppercase tracking-wider mb-1.5">Block Title</label>
+                <input type="text" id="cal-input-title" required placeholder="e.g. System Architecture Design" class="w-full bg-bgDark border border-borderDark rounded-xl px-3.5 py-2.5 text-sm text-textMain outline-none focus:border-accent transition" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted uppercase tracking-wider mb-1.5">Category</label>
+                    <select id="cal-input-category" class="w-full bg-bgDark border border-borderDark rounded-xl px-3 py-2.5 text-sm text-textMain outline-none focus:border-accent transition">
+                        <option value="deepwork">Deep Work</option>
+                        <option value="meeting">Meeting</option>
+                        <option value="break">Break</option>
+                        <option value="personal">Personal</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted uppercase tracking-wider mb-1.5">Recurrence</label>
+                    <select id="cal-input-recurrence" class="w-full bg-bgDark border border-borderDark rounded-xl px-3 py-2.5 text-sm text-textMain outline-none focus:border-accent transition">
+                        <option value="none">Does not repeat</option>
+                        <option value="daily">Every day</option>
+                        <option value="weekday">Weekdays (Mon-Fri)</option>
+                        <option value="weekly">Every week</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted uppercase tracking-wider mb-1.5">Start Time</label>
+                    <input type="time" id="cal-input-start" required step="900" class="w-full bg-bgDark border border-borderDark rounded-xl px-3 py-2.5 text-sm text-textMain outline-none focus:border-accent transition" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-textMuted uppercase tracking-wider mb-1.5">End Time</label>
+                    <input type="time" id="cal-input-end" required step="900" class="w-full bg-bgDark border border-borderDark rounded-xl px-3 py-2.5 text-sm text-textMain outline-none focus:border-accent transition" />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-textMuted uppercase tracking-wider mb-1.5">Auto-Buffer Break</label>
+                <select id="cal-input-buffer" class="w-full bg-bgDark border border-borderDark rounded-xl px-3 py-2.5 text-sm text-textMain outline-none focus:border-accent transition">
+                    <option value="0">No Buffer</option>
+                    <option value="5">+ 5 minutes Break</option>
+                    <option value="10">+ 10 minutes Break</option>
+                    <option value="15">+ 15 minutes Break</option>
+                </select>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-borderDark/60 mt-6">
+                <button id="cal-btn-delete" type="button" class="hidden px-4 py-2 rounded-xl text-xs font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 transition">Delete</button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button id="cal-modal-close-2" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold text-textMuted hover:text-textMain transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold bg-accent text-white hover:opacity-90 transition shadow-md shadow-accent/20">Save Block</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

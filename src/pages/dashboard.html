@@ -1,0 +1,205 @@
+<section id="app-dashboard" class="app-module p-4 md:p-6 overflow-y-auto">
+    <div class="max-w-6xl mx-auto w-full pb-10 space-y-5">
+
+        <!-- Top Row: Greeting + Quick Stats -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-textMain" id="dash-greeting">Good morning.</h1>
+                <p class="text-sm text-textMuted mt-0.5" id="dash-subtext">Here's your study overview.</p>
+            </div>
+            <div class="flex gap-2 shrink-0" id="dash-action-row">
+                <button onclick="openHeaderSearch()" class="flex items-center gap-2 px-4 py-2 glass-sidebar border border-borderDark rounded-xl text-sm text-textMuted hover:text-textMain hover:border-accent/50 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Search
+                </button>
+                <button onclick="openGlobalCapture()" class="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-lg shadow-accent/20">
+                    + Capture
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Objective Banner -->
+        <div class="glass-sidebar border border-borderDark rounded-2xl px-5 py-4 flex items-center gap-4">
+            <div class="w-8 h-8 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div class="flex-1">
+                <label class="text-[10px] uppercase text-accent font-bold tracking-widest block mb-0.5">Today's Objective</label>
+                <input type="text" id="daily-goal-input" onchange="saveGoal()" placeholder="What's your main goal today?" class="w-full bg-transparent border-none text-base font-medium outline-none text-textMain focus:ring-0 placeholder:text-textMuted/50"/>
+            </div>
+        </div>
+
+        <!-- Stat Cards Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="digest-grid">
+            <!-- To-Do -->
+            <div class="glass-sidebar border border-borderDark rounded-2xl p-4 relative overflow-hidden group hover:border-accent/40 transition-colors cursor-pointer" onclick="switchApp('kanban')">
+                <div class="absolute top-3 right-3 w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+                <p class="text-[10px] font-semibold text-textMuted uppercase tracking-wider mb-2">Tasks Due</p>
+                <div id="digest-tasks" class="text-3xl font-bold text-textMain">0</div>
+                <p class="text-[10px] text-textMuted mt-1">open items</p>
+            </div>
+            <!-- SRS Due -->
+            <div class="glass-sidebar border border-borderDark rounded-2xl p-4 relative overflow-hidden group hover:border-mint/40 transition-colors cursor-pointer" onclick="switchApp('flashcards')">
+                <div class="absolute top-3 right-3 w-7 h-7 rounded-lg bg-mint/10 flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                </div>
+                <p class="text-[10px] font-semibold text-textMuted uppercase tracking-wider mb-2">Cards Due</p>
+                <div id="digest-srs" class="text-3xl font-bold text-textMain">0</div>
+                <p class="text-[10px] text-textMuted mt-1">for review</p>
+            </div>
+            <!-- Focus Tracked -->
+            <div class="glass-sidebar border border-borderDark rounded-2xl p-4 relative overflow-hidden group hover:border-accent/40 transition-colors">
+                <div class="absolute top-3 right-3 w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <p class="text-[10px] font-semibold text-textMuted uppercase tracking-wider mb-2">Focus Today</p>
+                <div id="digest-focus" class="text-3xl font-bold text-textMain">0h</div>
+                <p class="text-[10px] text-textMuted mt-1">tracked</p>
+            </div>
+            <!-- AI Synthesis -->
+            <div class="glass-sidebar border border-borderDark rounded-2xl p-4 relative overflow-hidden group hover:border-accent/40 transition-colors cursor-pointer" onclick="openAISynthesisPanel()">
+                <div class="absolute top-3 right-3 w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <span class="text-accent text-sm">✦</span>
+                </div>
+                <p class="text-[10px] font-semibold text-textMuted uppercase tracking-wider mb-2">Knowledge</p>
+                <div class="flex items-center gap-2">
+                    <div id="synthesis-pct" class="text-3xl font-bold text-textMain">0%</div>
+                </div>
+                <div id="synthesis-detail" class="text-[10px] text-textMuted mt-1 truncate">linked notes</div>
+                <!-- hidden elements kept for JS compat -->
+                <div id="synthesis-ring" class="hidden"></div>
+                <svg class="hidden"><circle id="synthesis-ring-fill" stroke-dasharray="88" stroke-dashoffset="88"/></svg>
+                <div id="synthesis-score-label" class="hidden"></div>
+                <div id="synthesis-bar" class="hidden"></div>
+            </div>
+        </div>
+
+        <!-- Streak Card — full width -->
+        <div class="glass-sidebar border border-borderDark rounded-2xl p-5 mb-5">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-sm font-semibold text-textMain tracking-wide uppercase" style="letter-spacing:.06em;">Streak</h3>
+                <span id="streak-flame" style="display:inline-block; transform-origin:bottom center; font-size:22px; line-height:1;">💤</span>
+            </div>
+
+            <!-- Main layout: big number left | stats right | 7-day bar fills bottom -->
+            <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start;">
+
+                <!-- Big streak number -->
+                <div style="flex-shrink:0; text-align:center; min-width:90px;">
+                    <div id="streak-count" style="font-size:72px; font-weight:200; line-height:1; letter-spacing:-0.04em; font-variant-numeric:tabular-nums; color:rgb(var(--text-main));">0</div>
+                    <div style="font-size:11px; color:rgb(var(--text-muted)); margin-top:2px; font-weight:500; text-transform:uppercase; letter-spacing:.08em;">day streak</div>
+                </div>
+
+                <!-- Stats 2×2 -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; flex:1; min-width:200px;">
+                    <div style="background:rgba(0,0,0,0.18); border-radius:10px; padding:10px 12px;">
+                        <div style="font-size:10px; color:rgb(var(--text-muted)); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px;">Longest</div>
+                        <div id="streak-best" style="font-size:20px; font-weight:600; color:rgb(var(--text-main)); line-height:1.2;">0</div>
+                        <div style="font-size:9px; color:rgb(var(--text-muted)); margin-top:1px;">days</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.18); border-radius:10px; padding:10px 12px;">
+                        <div style="font-size:10px; color:rgb(var(--text-muted)); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px;">This Month</div>
+                        <div id="streak-month" style="font-size:20px; font-weight:600; color:rgb(var(--text-main)); line-height:1.2;">0</div>
+                        <div style="font-size:9px; color:rgb(var(--text-muted)); margin-top:1px;">active days</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.18); border-radius:10px; padding:10px 12px;">
+                        <div style="font-size:10px; color:rgb(var(--text-muted)); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px;">Sessions</div>
+                        <div id="streak-total-sessions" style="font-size:20px; font-weight:600; color:rgb(var(--text-main)); line-height:1.2;">0</div>
+                        <div style="font-size:9px; color:rgb(var(--text-muted)); margin-top:1px;">pomodoros</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.18); border-radius:10px; padding:10px 12px;">
+                        <div style="font-size:10px; color:rgb(var(--text-muted)); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px;">Focus Time</div>
+                        <div id="streak-total-focus" style="font-size:20px; font-weight:600; color:rgb(var(--text-main)); line-height:1.2;">0m</div>
+                        <div style="font-size:9px; color:rgb(var(--text-muted)); margin-top:1px;">all time</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last 7 days bar -->
+            <div style="margin-top:20px;">
+                <div style="font-size:10px; color:rgb(var(--text-muted)); text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px;">Last 7 days</div>
+                <div style="display:flex; gap:6px;" id="streak-week-dots"></div>
+            </div>
+
+            <!-- Status message -->
+            <div id="streak-message" style="margin-top:12px; font-size:11px; color:rgb(var(--text-muted)); font-style:italic; line-height:1.6;"></div>
+        </div>
+
+        <!-- Main Content: 2-col layout -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            <!-- LEFT: Charts col (2/3) -->
+            <div class="md:col-span-2 space-y-5">
+
+                <!-- Weekly Subject Breakdown -->
+                <div id="session-breakdown-dash" class="glass-sidebar border border-borderDark rounded-2xl p-5 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-textMain">This Week by Subject</h3>
+                        <button onclick="switchApp('sessions')" class="text-xs text-accent hover:underline">View all →</button>
+                    </div>
+                    <div id="session-subject-bars" class="space-y-2.5"></div>
+                </div>
+
+                <!-- Output Ratio -->
+                <div class="glass-sidebar border border-borderDark rounded-2xl p-5 flex flex-col md:flex-row items-center gap-6">
+                    <div class="shrink-0">
+                        <h3 class="text-sm font-semibold text-textMain mb-3">Output Ratio</h3>
+                        <div id="pie-chart-container" class="relative w-36 h-36"></div>
+                    </div>
+                    <div id="pie-legend" class="flex flex-col gap-2 text-xs text-textMain"></div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Info col (1/3) -->
+            <div class="space-y-4">
+
+                <!-- Exam Countdowns -->
+                <div id="exam-countdowns-row" class="hidden">
+                    <div class="glass-sidebar border border-borderDark rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-semibold text-textMain">Exams</h3>
+                            <button onclick="addExamCountdown()" class="text-xs text-accent hover:underline">+ Add</button>
+                        </div>
+                        <div id="exam-countdowns-list" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="glass-sidebar border border-borderDark rounded-2xl p-4">
+                    <h3 class="text-sm font-semibold text-textMain mb-3">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button onclick="switchApp('notes'); setTimeout(createNewNote, 100)" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/20 border border-borderDark transition text-sm text-textMain group">
+                            <span class="w-6 h-6 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover:bg-accent/20 transition">✏</span>
+                            New Note
+                        </button>
+                        <button onclick="switchApp('pomodoro')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/20 border border-borderDark transition text-sm text-textMain group">
+                            <span class="w-6 h-6 rounded-lg bg-mint/10 flex items-center justify-center text-mint group-hover:bg-mint/20 transition">⏱</span>
+                            Start Focus
+                        </button>
+                        <button onclick="switchApp('flashcards')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/20 border border-borderDark transition text-sm text-textMain group">
+                            <span class="w-6 h-6 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover:bg-accent/20 transition">🃏</span>
+                            Review Cards
+                        </button>
+                        <button onclick="openAISynthesisPanel()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/20 border border-borderDark transition text-sm text-textMain group">
+                            <span class="w-6 h-6 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover:bg-accent/20 transition">✦</span>
+                            AI Synthesis
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Notes -->
+                <div class="glass-sidebar border border-borderDark rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-textMain">Recent Notes</h3>
+                        <button onclick="switchApp('notes')" class="text-xs text-accent hover:underline">All →</button>
+                    </div>
+                    <div id="dash-recent-notes" class="space-y-1.5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

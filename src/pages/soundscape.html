@@ -1,0 +1,71 @@
+<section id="app-soundscape" class="app-module hidden p-4 md:p-8 overflow-y-auto">
+  <div class="max-w-2xl mx-auto w-full space-y-5">
+    <div>
+      <h2 class="text-xl md:text-2xl font-bold text-textMain mb-1">Soundscape Mixer</h2>
+      <p class="text-xs text-textMuted">Cool audio shi</p>
+    </div>
+
+    <!-- Main Mixer Card -->
+    <div class="glass-sidebar border border-borderDark rounded-xl p-5 card-grad">
+      <div id="sound-mixer"></div>
+      <div class="mt-4 flex items-center justify-between border-t border-borderDark pt-4">
+        <span class="text-xs text-textMuted">Master</span>
+        <input type="range" min="0" max="1" step=".01" value=".5" id="sound-master" class="crange flex-1 mx-3">
+        <button id="sound-toggle" onclick="toggleSoundscape()" class="px-4 py-1.5 bg-accent text-white rounded-lg text-sm font-bold">▶ Start</button>
+      </div>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button onclick="loadSoundPreset('focus')" class="chip">Deep Focus</button>
+        <button onclick="loadSoundPreset('rain')" class="chip">Rainy Day</button>
+        <button onclick="loadSoundPreset('cafe')" class="chip">Café</button>
+        <button onclick="loadSoundPreset('night')" class="chip">Night</button>
+        <button onclick="loadSoundPreset('off')" class="chip">All Off</button>
+      </div>
+    </div>
+
+    <!-- Binaural Beats Card -->
+    <div class="glass-sidebar border border-borderDark rounded-xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 class="text-sm font-semibold text-textMain">Binaural Beats</h3>
+        </div>
+        <button id="binaural-toggle-btn" onclick="toggleBinauralBeats()" class="px-3 py-1.5 rounded-lg border border-borderDark text-xs font-semibold text-textMuted hover:border-accent hover:text-accent transition-all">Off</button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Beat frequency -->
+        <div>
+          <label class="text-[11px] font-semibold text-textMuted uppercase tracking-wider block mb-2">Beat Frequency</label>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button onclick="setBinauralBeat('delta', 2)" class="chip text-[10px]">Delta 2Hz<br><span class="opacity-60 font-normal">Deep sleep</span></button>
+            <button onclick="setBinauralBeat('theta', 7)" class="chip text-[10px]">Theta 7Hz<br><span class="opacity-60 font-normal">Relaxed focus</span></button>
+            <button onclick="setBinauralBeat('alpha', 10)" class="chip text-[10px]">Alpha 10Hz<br><span class="opacity-60 font-normal">Flow state</span></button>
+            <button onclick="setBinauralBeat('beta', 20)" class="chip text-[10px]">Beta 20Hz<br><span class="opacity-60 font-normal">Alert/active</span></button>
+            <button onclick="setBinauralBeat('gamma', 40)" class="chip text-[10px]">Gamma 40Hz<br><span class="opacity-60 font-normal">Peak cognitive</span></button>
+          </div>
+          <div class="flex items-center gap-3">
+            <input type="range" min="1" max="40" step="0.5" value="7" id="binaural-hz" oninput="updateBinauralHz(this.value)" class="crange flex-1">
+            <span id="binaural-hz-display" class="text-sm font-mono text-accent w-16 text-right">7 Hz</span>
+          </div>
+        </div>
+        <!-- Carrier & Volume -->
+        <div class="space-y-3">
+          <div>
+            <label class="text-[11px] font-semibold text-textMuted uppercase tracking-wider block mb-2">Carrier Tone</label>
+            <div class="flex items-center gap-3">
+              <input type="range" min="80" max="400" step="10" value="200" id="binaural-carrier" oninput="updateBinauralCarrier(this.value)" class="crange flex-1">
+              <span id="binaural-carrier-display" class="text-sm font-mono text-textMuted w-16 text-right">200 Hz</span>
+            </div>
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-textMuted uppercase tracking-wider block mb-2">Volume</label>
+            <div class="flex items-center gap-3">
+              <input type="range" min="0" max="0.5" step="0.01" value="0.15" id="binaural-vol" oninput="updateBinauralVol(this.value)" class="crange flex-1">
+              <span id="binaural-vol-display" class="text-sm font-mono text-textMuted w-16 text-right">15%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="text-[10px] text-textMuted mt-3 italic">Requires headphones for the stereo separation effect. Keep volume low for extended sessions.</p>
+    </div>
+
+  </div>
+</section>

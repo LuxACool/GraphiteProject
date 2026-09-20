@@ -1,0 +1,44 @@
+/* Custom Styles for Time-Blocking Calendar Grid */
+
+/* Custom Scrollbar for smooth timeline navigation */
+#cal-grid-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#cal-grid-scroll-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#cal-grid-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+}
+
+#cal-grid-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Prevent accidental scrolling during block drag gestures */
+#cal-blocks-layer > div {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Resize Handle Pulse Effect on Hover */
+.cal-resize-handle:hover > div {
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: scaleX(1.2);
+    transition: all 0.2s ease;
+}
+
+/* Time Indicator Pulse Animation */
+@keyframes pulse-ring {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+#cal-live-indicator .rounded-full {
+    animation: pulse-ring 2s infinite ease-in-out;
+}

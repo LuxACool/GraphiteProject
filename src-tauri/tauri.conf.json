@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "graphite",
-  "version": "0.1.0",
-  "identifier": "com.atlas.graphite",
+  "productName": "Graphite",
+  "version": "2.0.0",
+  "identifier": "com.tofyouu.graphite",
   "build": {
     "frontendDist": "../src"
   },
@@ -10,7 +10,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "graphite",
+        "title": "Graphite",
         "width": 800,
         "height": 600
       }

@@ -1,0 +1,216 @@
+<section id="app-notes" class="app-module hidden flex-col md:flex-row h-full overflow-hidden relative">
+
+    <!-- Autocomplete Dropdown -->
+    <div id="editor-autocomplete" class="hidden absolute glass-sidebar border border-borderDark rounded-lg shadow-2xl z-50 text-sm py-1 max-h-48 overflow-y-auto min-w-[200px]"></div>
+
+    <!-- Wiki-Link Inline Suggestion Popup (fixed to viewport) -->
+    <div id="wiki-suggest-popup" class="hidden fixed glass-sidebar border border-accent/30 rounded-xl shadow-2xl z-[9800] w-64 overflow-hidden" style="backdrop-filter:blur(12px);">
+    </div>
+
+    <!-- Notes Inner Sidebar -->
+    <div class="w-full md:w-64 md:h-full border-b md:border-b-0 md:border-r border-borderDark glass-sidebar flex flex-col shrink-0 notes-list-panel" id="notes-list-panel">
+        <div class="p-3 border-b border-borderDark flex flex-col gap-2 notes-list-header">
+            <div class="flex items-center justify-between notes-list-heading">
+                <div class="notes-list-title-wrap"><span class="notes-list-title text-xs font-bold text-textMain">Notes</span><span class="notes-list-subtitle">Your study vault</span></div>
+                <div class="flex items-center gap-1">
+                    <span id="notes-count" class="text-[10px] text-textMuted font-mono mr-1"></span>
+                    <button class="notes-icon-btn w-7 h-7 rounded-lg glass-bg border border-borderDark text-textMuted hover:text-textMain flex items-center justify-center transition text-xs" onclick="document.getElementById('md-import').click()" title="Import Markdown">↑</button>
+                    <input type="file" id="md-import" accept=".md,.txt" class="hidden" onchange="importMarkdown(event)">
+                    <button class="notes-new-btn w-8 h-8 rounded-lg bg-accent text-white flex items-center justify-center transition hover:opacity-80 text-base font-bold" onclick="createNewNote()" title="New Note (Alt+N)">+</button>
+                </div>
+            </div>
+            <div class="notes-search-wrap"><span class="notes-search-icon">⌕</span><input type="text" id="note-search" placeholder="Search notes…" class="w-full bg-bgDark border border-borderDark text-textMain rounded-lg px-3 py-1.5 text-xs outline-none focus:border-accent transition" oninput="filterNotes()"/></div>
+            <label class="ccheck px-0.5">
+                <input type="checkbox" id="search-all-ws" onchange="filterNotes()">
+                <span class="ccheck-box"><svg class="ccheck-tick" width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="text-[10px] text-textMuted select-none">All workspaces</span>
+            </label>
+        </div>
+        <div id="note-list" class="flex-1 overflow-y-auto p-2 space-y-0.5"></div>
+    </div>
+
+    <!-- Editor -->
+    <div class="flex-1 flex flex-col relative glass-bg min-h-0 notes-editor-shell">
+        <!-- Mobile-only: always-visible notes browse bar -->
+        <button id="mob-notes-bar" onclick="toggleMobileNotesList()" class="md:hidden w-full flex items-center justify-between px-4 py-2.5 border-b border-borderDark glass-sidebar shrink-0" style="cursor:pointer;z-index:10;position:relative;">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:16px;">📋</span>
+                <span style="font-size:13px;font-weight:600;color:rgb(var(--text-main));">My Notes</span>
+                <span id="mob-notes-bar-count" style="font-size:11px;color:rgb(var(--accent));background:rgba(var(--accent),0.12);border:1px solid rgba(var(--accent),0.2);border-radius:20px;padding:1px 8px;font-weight:700;"></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;color:rgb(var(--text-muted));font-size:12px;">
+                <span>Tap to browse</span>
+                <span id="mob-notes-bar-chevron" style="font-size:10px;display:inline-block;transition:transform 0.25s;">▼</span>
+            </div>
+        </button>
+        <div id="editor-empty" class="absolute inset-0 flex items-center justify-center text-textMuted text-sm">
+            <div class="notes-empty-state">
+                <div class="notes-empty-title">Your study space</div>
+                <div class="notes-empty-copy">Select a note or start a fresh one.</div>
+                <button class="ui-btn ui-btn-primary notes-empty-btn" onclick="createNewNote()">+ New Note</button>
+            </div>
+        </div>
+
+        <div id="editor-active" class="hidden h-full flex flex-col w-full relative">
+            <!-- Toolbar -->
+            <div class="h-auto py-2 border-b border-borderDark flex items-center px-3 justify-between glass-sidebar shrink-0 gap-2 notes-editor-toolbar">
+                <div class="flex gap-1.5 items-center notes-toolbar-left">
+                    <!-- Mobile-only: back arrow returns to the note list sheet -->
+                    <button onclick="toggleMobileNotesList()" class="md:hidden w-8 h-8 -ml-1 rounded-lg text-textMain hover:bg-black/20 transition flex items-center justify-center" title="Back to notes" aria-label="Back to notes">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <!-- Undo / Redo -->
+                    <button id="btn-undo" onclick="undoNote()" class="hidden md:inline-flex w-7 h-7 rounded-lg bg-bgDark border border-borderDark text-textMain hover:bg-black/20 transition items-center justify-center text-sm" title="Undo (Ctrl+Z)">↩</button>
+                    <button id="btn-redo" onclick="redoNote()" class="hidden md:inline-flex w-7 h-7 rounded-lg bg-bgDark border border-borderDark text-textMain hover:bg-black/20 transition items-center justify-center text-sm" title="Redo (Ctrl+Y)">↪</button>
+                    <div id="toolbar-divider" class="hidden md:block w-px h-5 bg-borderDark mx-0.5 self-center"></div>
+                    <!-- Desktop: show all actions inline -->
+                    <button onclick="applyNoteTemplate()" class="hidden md:inline-flex px-2.5 py-1 text-xs bg-bgDark border border-borderDark text-textMuted rounded-lg hover:text-textMain hover:border-accent/40 transition" title="Insert template">Template</button>
+                    <button onclick="extractTasks()" class="hidden md:inline-flex px-2.5 py-1 text-xs bg-accent/10 border border-accent/20 text-accent font-semibold rounded-lg hover:bg-accent/20 transition">Extract Tasks</button>
+                    <button onclick="extractFlashcards()" class="hidden md:inline-flex px-2.5 py-1 text-xs bg-mint/10 border border-mint/20 text-mint font-semibold rounded-lg hover:bg-mint/20 transition">Extract Cards</button>
+                </div>
+                <div class="flex gap-2 items-center notes-toolbar-right">
+                    <span id="note-save-status" class="note-save-status" aria-live="polite">Saved</span>
+                    <span id="note-wordcount" class="text-[10px] text-textMuted font-mono hidden"></span>
+                    <span id="note-timestamp" class="text-[10px] text-textMuted hidden md:inline"></span>
+                    <!-- Desktop: Delete visible inline -->
+                    <button onclick="deleteCurrentNote()" class="hidden md:inline-flex px-2.5 py-1 text-xs text-red-400/70 hover:text-red-400 border border-red-400/20 hover:border-red-400/40 rounded-lg transition">Delete</button>
+                    
+                    <!-- FIX: Eye icon is now visible on desktop and toggles between Write/Preview automatically -->
+                    <button id="mob-eye-btn" onclick="switchEditorTab(document.getElementById('editor-tab-preview').classList.contains('hidden') ? 'preview' : 'write')" class="w-8 h-8 rounded-lg bg-bgDark border border-borderDark text-textMain hover:bg-black/20 transition flex items-center justify-center" title="Toggle Rendered Preview" aria-label="Toggle preview">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+
+                    <!-- Mobile: ··· overflow button -->
+                    <div class="relative md:hidden" id="note-overflow-wrap">
+                        <button id="note-overflow-btn"
+                            onclick="noteOverflowToggle()"
+                            class="w-8 h-8 rounded-lg bg-bgDark border border-borderDark text-textMuted hover:text-textMain flex items-center justify-center transition"
+                            aria-label="More note actions"
+                            aria-expanded="false"
+                            aria-haspopup="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                            </svg>
+                        </button>
+                        <!-- Popover -->
+                        <div id="note-overflow-menu"
+                            class="hidden absolute right-0 top-10 z-[9500] min-w-[180px] rounded-xl border border-borderDark overflow-hidden shadow-2xl"
+                            style="background: rgb(var(--bg-sidebar));">
+                            <div class="px-3 py-2 text-[10px] font-bold uppercase tracking-widest" style="color: rgb(var(--text-muted)); border-bottom: 1px solid rgb(var(--border-color));">Note Actions</div>
+                            <button onclick="applyNoteTemplate(); noteOverflowClose()" class="note-overflow-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                                Template
+                            </button>
+                            <button onclick="extractTasks(); noteOverflowClose()" class="note-overflow-item" style="color: rgb(var(--accent));">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                Extract Tasks
+                            </button>
+                            <button onclick="extractFlashcards(); noteOverflowClose()" class="note-overflow-item" style="color: rgb(var(--mint, 52 211 153));">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                Extract Cards
+                            </button>
+                            <div style="height:1px; background: rgb(var(--border-color)); margin: 2px 0;"></div>
+                            <button onclick="deleteCurrentNote(); noteOverflowClose()" class="note-overflow-item" style="color: rgb(239 68 68 / 0.8);">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                                Delete Note
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Bar (desktop only) -->
+            <div class="hidden md:flex items-center gap-1 px-4 border-b border-borderDark glass-sidebar shrink-0 h-10 notes-tabbar">
+                <button id="tab-btn-write" onclick="switchEditorTab('write')" class="editor-tab-btn px-3 h-full text-xs font-semibold text-accent border-b-2 border-accent transition-all">Write</button>
+                <button id="tab-btn-preview" onclick="switchEditorTab('preview')" class="editor-tab-btn px-3 h-full text-xs font-semibold text-textMuted border-b-2 border-transparent hover:text-textMain transition-all">Preview</button>
+                <button id="tab-btn-split" onclick="switchEditorTab('split')" class="editor-tab-btn hidden md:flex items-center gap-1 px-3 h-full text-xs font-semibold text-textMuted border-b-2 border-transparent hover:text-textMain transition-all" title="Side-by-side write + preview">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/></svg>
+                    Split
+                </button>
+            </div>
+
+            <!-- Editor Content — tabbed -->
+            <div class="flex-1 flex flex-col overflow-hidden relative">
+
+                <!-- WRITE TAB -->
+                <div id="editor-tab-write" class="flex flex-col h-full w-full">
+                    <div class="notes-title-area"><div class="notes-title-accent"></div><input type="text" id="note-title" oninput="saveNotes()" placeholder="Untitled Note" class="bg-transparent text-xl md:text-2xl font-bold outline-none text-textMain w-full px-4 md:px-6 pt-4 md:pt-5 pb-2 drop-shadow-md shrink-0"/></div>
+                    <input type="text" id="note-tags" oninput="saveNotes()" placeholder="Add tags..." class="bg-transparent outline-none text-accent text-xs px-4 md:px-6 pb-3 border-b border-borderDark shrink-0"/>
+                    <div class="relative border-b border-borderDark glass-sidebar shrink-0 md-toolbar-wrap">
+                        <div class="flex items-center gap-1 px-2 md:px-4 py-1.5 text-textMuted overflow-x-auto md-toolbar-scroll" style="scrollbar-width:none;-ms-overflow-style:none;">
+                            <button type="button" title="Bold (Ctrl+B)" onclick="mdWrap('**','**')" class="px-2 py-1 text-xs font-bold rounded hover:bg-bgDark hover:text-textMain shrink-0">B</button>
+                            <button type="button" title="Italic (Ctrl+I)" onclick="mdWrap('*','*')" class="px-2 py-1 text-xs italic rounded hover:bg-bgDark hover:text-textMain shrink-0">I</button>
+                            <button type="button" title="Strikethrough" onclick="mdWrap('~~','~~')" class="px-2 py-1 text-xs line-through rounded hover:bg-bgDark hover:text-textMain shrink-0">S</button>
+                            <span class="w-px h-4 bg-borderDark mx-1 shrink-0"></span>
+                            <button type="button" title="Heading 1" onclick="mdLinePrefix('# ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain shrink-0">H1</button>
+                            <button type="button" title="Heading 2" onclick="mdLinePrefix('## ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain shrink-0">H2</button>
+                            <button type="button" title="Heading 3" onclick="mdLinePrefix('### ')" class="px-2 py-1 text-xs font-semibold rounded hover:bg-bgDark hover:text-textMain shrink-0">H3</button>
+                            <span class="w-px h-4 bg-borderDark mx-1 shrink-0"></span>
+                            <button type="button" title="Bullet list" onclick="mdLinePrefix('- ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">• List</button>
+                            <button type="button" title="Numbered list" onclick="mdLinePrefix('1. ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">1. List</button>
+                            <button type="button" title="Task list" onclick="mdLinePrefix('- [ ] ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&#9744; Task</button>
+                            <button type="button" title="Quote" onclick="mdLinePrefix('> ')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&#10077;</button>
+                            <span class="w-px h-4 bg-borderDark mx-1 shrink-0"></span>
+                            <button type="button" title="Inline code" onclick="mdWrap('`','`')" class="px-2 py-1 text-xs font-mono rounded hover:bg-bgDark hover:text-textMain shrink-0">&lt;/&gt;</button>
+                            <button type="button" title="Link (Ctrl+K)" onclick="mdInsertLink()" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&#128279;</button>
+                            <button type="button" title="Insert formula" onclick="insertFormula()" class="px-2 py-1 text-xs font-serif rounded hover:bg-bgDark hover:text-textMain shrink-0">Σ</button>
+                            <button type="button" title="Table" onclick="mdInsertTable()" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&#9646;</button>
+                            <button type="button" title="Horizontal rule" onclick="mdInsertAtCursor('\n\n---\n\n')" class="px-2 py-1 text-xs rounded hover:bg-bgDark hover:text-textMain shrink-0">&mdash;</button>
+                            <span class="ml-auto text-[10px] text-textMuted px-2 hidden md:inline shrink-0">Markdown (GFM) supported</span>
+                        </div>
+                        <div class="md-toolbar-fade pointer-events-none"></div>
+                    </div>
+                    <textarea id="note-body-raw" oninput="handleEditorInput(event); checkWikiLinkSuggestion();" onkeydown="handleEditorKeydown(event)" ondragover="noteEditorDragOver(event)" ondrop="noteEditorDrop(event)" onfocus="checkWikiLinkSuggestion()" onblur="setTimeout(()=>{const p=document.getElementById('wiki-suggest-popup'); if(p)p.classList.add('hidden');}, 200)" class="flex-1 w-full bg-transparent text-textMain font-mono text-[14px] md:text-[13px] outline-none resize-none leading-relaxed p-4 md:p-6 drop-shadow-sm" placeholder="Write here... [[ wiki-links, # tags, @ dates, / blocks, Q :: A cards."></textarea>
+                </div>
+
+                <!-- PREVIEW TAB -->
+                <div id="editor-tab-preview" class="hidden flex-col h-full w-full overflow-y-auto glass-sidebar">
+                    <div class="notes-preview-head"><div><span class="notes-preview-kicker">Rendered note</span><span class="notes-preview-hint">Markdown + KaTeX</span></div><span class="notes-preview-math">∫  √  π</span></div>
+                    <div id="preview-note-title" class="notes-preview-title"></div>
+                    <div id="markdown-preview" class="flex-1 overflow-y-auto prose p-4 md:p-8 max-w-none prose-sm md:prose-base drop-shadow-sm"></div>
+
+                    <div class="border-t border-borderDark glass-bg p-4 overflow-y-auto shrink-0">
+                        <h4 class="text-xs font-semibold text-textMuted uppercase mb-3 tracking-wider">Backlinks</h4>
+                        <div id="backlinks-container" class="space-y-2 text-sm text-textMain"></div>
+                    </div>
+                    <!-- FOCUS-AWARE WIKI SUGGESTIONS PANEL -->
+                    <div id="focus-suggestions-panel" class="hidden border-t border-accent/30 glass-bg p-4 shrink-0 focus-sugg-panel" style="border-top-width:1px;">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-accent focus-dot"></span>
+                                <h4 class="text-xs font-bold text-accent uppercase tracking-wider">Second Brain Active</h4>
+                            </div>
+                            <span class="text-[10px] text-textMuted font-mono">Focus-Aware</span>
+                        </div>
+                        <p class="text-[10px] text-textMuted mb-3 leading-relaxed">Contextual notes surfaced from your vault — semantically similar to what you're writing right now.</p>
+                        <div id="focus-suggestions-list" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
+                        <div id="focus-suggestions-empty" class="hidden text-[11px] text-textMuted italic">Keep writing — suggestions appear as your note grows...</div>
+                    </div>
+                </div>
+
+                <!-- SPLIT TAB (desktop only) -->
+                <div id="editor-tab-split" class="h-full w-full">
+                    <!-- Left: write pane -->
+                    <div id="split-write-pane">
+                        <input type="text" id="split-note-title-mirror" placeholder="Untitled Note" class="bg-transparent text-lg font-bold outline-none text-textMain w-full px-4 pt-3 pb-2 shrink-0 border-b border-borderDark/50" oninput="document.getElementById('note-title').value=this.value; saveNotes();" readonly/>
+                        <textarea id="split-body-raw" oninput="syncSplitToMain(this.value)" onkeydown="handleEditorKeydown(event)" class="flex-1 w-full bg-transparent text-textMain font-mono text-[13px] outline-none resize-none leading-relaxed p-4 drop-shadow-sm" placeholder="Write here... KaTeX: $E=mc^2$ or $$\int_0^\infty$$"></textarea>
+                    </div>
+                    <!-- Divider -->
+                    <div class="w-px bg-borderDark shrink-0"></div>
+                    <!-- Right: preview pane -->
+                    <div id="split-preview-pane" class="glass-sidebar">
+                        <div class="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-borderDark/50 shrink-0">
+                            <span class="text-[10px] font-bold text-textMuted uppercase tracking-wider">Live Preview</span>
+                            <span id="split-katex-badge" class="chip text-[9px] items-center gap-1">
+                                <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                KaTeX
+                            </span>
+                        </div>
+                        <div id="split-markdown-preview" class="prose p-4 max-w-none prose-sm drop-shadow-sm overflow-y-auto" style="height: calc(100% - 38px);"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,521 @@
+/* ============================================================
+   Graphite UI System
+   Shared visual language for desktop + mobile.
+   This file is intentionally component-focused: it layers on top
+   of the existing Tailwind classes without changing app behavior.
+   ============================================================ */
+:root {
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-5: 20px;
+  --ui-space-6: 24px;
+  --ui-space-8: 32px;
+  --ui-radius-sm: 8px;
+  --ui-radius-md: 12px;
+  --ui-radius-lg: 16px;
+  --ui-radius-xl: 20px;
+  --ui-control-h: 38px;
+  --ui-control-h-sm: 34px;
+  --ui-sidebar-w: 256px;
+  --ui-content-max: 1152px;
+  --ui-shadow-sm: 0 2px 8px rgb(0 0 0 / .12);
+  --ui-shadow-md: 0 8px 24px rgb(0 0 0 / .16);
+  --ui-shadow-lg: 0 16px 48px rgb(0 0 0 / .22);
+  --ui-focus-ring: 0 0 0 3px rgb(var(--accent) / .22);
+  --ui-surface-1: rgb(var(--bg-main));
+  --ui-surface-2: rgb(var(--bg-sidebar));
+  --ui-surface-hover: rgb(var(--text-muted) / .08);
+  --ui-divider: rgb(var(--border-color));
+}
+
+/* ---- Global foundations ---- */
+html { background: rgb(var(--bg-main)); }
+body {
+  font-family: Inter, SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button, input, textarea, select { font: inherit; }
+button, [role="button"], .nav-item, .nav-section-header, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible,
+[tabindex]:focus-visible, .nav-item:focus-visible {
+  outline: none;
+  box-shadow: var(--ui-focus-ring);
+}
+
+/* ---- Shared surfaces ---- */
+.ui-surface {
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-divider);
+  border-radius: var(--ui-radius-md);
+}
+.ui-card {
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-divider);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-sm);
+}
+.ui-card-hover { transition: border-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease; }
+.ui-card-hover:hover {
+  border-color: rgb(var(--accent) / .30);
+  box-shadow: var(--ui-shadow-md);
+}
+
+/* Keep existing glass utilities consistent with the system. */
+.glass-sidebar { border-color: var(--ui-divider); }
+.glass-bg { border-color: var(--ui-divider); }
+
+/* ---- Typography hierarchy ---- */
+.ui-page-title { font-size: clamp(1.35rem, 2vw, 1.75rem); line-height: 1.2; font-weight: 700; letter-spacing: -.025em; }
+.ui-page-subtitle { margin-top: 4px; color: rgb(var(--text-muted)); font-size: .82rem; line-height: 1.5; }
+.ui-section-title { font-size: .95rem; line-height: 1.3; font-weight: 650; letter-spacing: -.01em; }
+.ui-eyebrow { color: rgb(var(--text-muted)); font-size: .68rem; line-height: 1.2; font-weight: 700; text-transform: uppercase; letter-spacing: .11em; }
+
+/* ---- Form controls ---- */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea, select {
+  border-radius: var(--ui-radius-sm);
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus, select:focus {
+  border-color: rgb(var(--accent) / .65) !important;
+  box-shadow: var(--ui-focus-ring);
+}
+input::placeholder, textarea::placeholder { color: rgb(var(--text-muted) / .72); }
+
+/* ---- Navigation ---- */
+#main-sidebar {
+  width: var(--ui-sidebar-w);
+  box-shadow: 8px 0 32px rgb(0 0 0 / .08);
+}
+#main-sidebar > div:first-child > div:first-child {
+  min-height: 68px;
+}
+.nav-section-header { min-height: 32px; }
+.nav-item {
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  font-size: 13px;
+}
+.nav-item:hover { border-color: rgb(var(--border-color) / .75); }
+.nav-item.active-nav {
+  border-color: rgb(var(--accent) / .20);
+  box-shadow: inset 3px 0 0 rgb(var(--accent));
+}
+.nav-item.active-nav::after { width: 6px; height: 6px; }
+
+/* ---- Desktop content rhythm ---- */
+.app-module > .max-w-6xl,
+.app-module > .max-w-5xl,
+.app-module > .max-w-4xl,
+.app-module > .max-w-3xl,
+.app-module > .max-w-2xl {
+  width: min(calc(100% - 48px), var(--ui-content-max));
+}
+
+/* Prevent wide controls from becoming visually noisy. */
+.app-module .rounded-xl { border-radius: var(--ui-radius-md); }
+.app-module .rounded-2xl { border-radius: var(--ui-radius-lg); }
+
+/* ---- Buttons ---- */
+.ui-btn {
+  min-height: var(--ui-control-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-radius: var(--ui-radius-sm);
+  font-size: .82rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: transform .12s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+.ui-btn:hover { transform: translateY(-1px); }
+.ui-btn:active { transform: translateY(0) scale(.98); }
+.ui-btn-primary { background: rgb(var(--accent)); color: #fff; box-shadow: 0 4px 14px rgb(var(--accent) / .22); }
+.ui-btn-primary:hover { box-shadow: 0 6px 18px rgb(var(--accent) / .30); }
+.ui-btn-secondary { background: var(--ui-surface-2); border-color: var(--ui-divider); color: rgb(var(--text-main)); }
+.ui-btn-secondary:hover { background: var(--ui-surface-hover); border-color: rgb(var(--accent) / .28); }
+.ui-btn-ghost { background: transparent; color: rgb(var(--text-muted)); }
+.ui-btn-ghost:hover { background: var(--ui-surface-hover); color: rgb(var(--text-main)); }
+
+/* ---- Mobile header ---- */
+#mobile-header {
+  display: none;
+  height: 56px;
+  min-height: 56px;
+  padding: 0 14px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--ui-divider);
+  background: rgb(var(--bg-sidebar) / .92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  position: sticky;
+  top: 0;
+  z-index: 80;
+}
+#mobile-header-title {
+  min-width: 0;
+  flex: 1;
+  text-align: center;
+  font-size: .9rem;
+  font-weight: 650;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mob-icon-btn {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: rgb(var(--text-muted));
+  background: transparent;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .12s ease;
+}
+.mob-icon-btn:hover { color: rgb(var(--text-main)); background: var(--ui-surface-hover); border-color: var(--ui-divider); }
+.mob-icon-btn:active { transform: scale(.95); }
+.mob-icon-btn svg { width: 19px; height: 19px; }
+
+/* ---- Mobile bottom navigation ---- */
+@media (max-width: 767px) {
+  :root { --ui-control-h: 42px; --ui-control-h-sm: 38px; }
+  body { overflow: hidden; }
+  #mobile-header { display: flex; }
+  #main-sidebar { width: min(86vw, 320px); box-shadow: 18px 0 48px rgb(0 0 0 / .30); }
+  #mobile-overlay { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+  main { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important; }
+  main > .flex-1 { min-height: 0; }
+  .app-module { overflow-y: auto; overflow-x: hidden; overscroll-behavior-y: contain; scrollbar-gutter: stable; }
+  .app-module > .max-w-6xl,
+  .app-module > .max-w-5xl,
+  .app-module > .max-w-4xl,
+  .app-module > .max-w-3xl,
+  .app-module > .max-w-2xl {
+    width: 100%;
+    max-width: none;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 28px;
+  }
+  .ui-page-title { font-size: 1.25rem; }
+  .ui-page-subtitle { font-size: .78rem; }
+
+  /* Comfortable touch targets. */
+  button, [role="button"], .nav-item, select,
+  input:not([type="checkbox"]):not([type="radio"]) { min-height: 42px; }
+  .nav-item { min-height: 42px; padding: 10px 12px; }
+  .nav-section-header { min-height: 38px; padding: 8px 12px; }
+
+  .mobile-bottom-nav {
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding: 4px 8px env(safe-area-inset-bottom, 0px);
+    background: rgb(var(--bg-sidebar) / .94);
+    border-top-color: rgb(var(--border-color) / .9);
+    box-shadow: 0 -8px 28px rgb(0 0 0 / .12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .mobile-bottom-nav__item { min-height: 54px; border-radius: 12px; gap: 3px; }
+  .mobile-bottom-nav__item:active { background: rgb(var(--text-muted) / .10); }
+  .mobile-bottom-nav__icon { width: 21px; height: 21px; }
+  .mobile-bottom-nav__label { font-size: 9px; }
+  .mobile-bottom-nav__home-pill { width: 44px; height: 44px; border-radius: 14px; box-shadow: 0 5px 16px rgb(var(--accent) / .35); }
+
+  /* Stack common header action rows cleanly on narrow phones. */
+  .app-module .flex.flex-col.md\:flex-row.md\:items-center.justify-between { align-items: stretch; }
+  .app-module .grid { min-width: 0; }
+  .app-module [class*="overflow-x-auto"] { scrollbar-width: none; }
+  .app-module [class*="overflow-x-auto"]::-webkit-scrollbar { display: none; }
+
+  /* Keep large dialogs inside the viewport. */
+  #ai-synthesis-panel > div,
+  #custom-modal > div,
+  #cmd-palette > div { max-height: calc(100dvh - 24px); }
+}
+
+/* ---- Small phones ---- */
+@media (max-width: 380px) {
+  #mobile-header { padding-inline: 10px; }
+  .app-module > .max-w-6xl,
+  .app-module > .max-w-5xl,
+  .app-module > .max-w-4xl,
+  .app-module > .max-w-3xl,
+  .app-module > .max-w-2xl { padding-left: 12px; padding-right: 12px; }
+  .mobile-bottom-nav { padding-left: 4px; padding-right: 4px; }
+  .mobile-bottom-nav__label { font-size: 8.5px; }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Motion system
+   Lightweight, CSS-first transitions for navigation and UI chrome.
+   ============================================================ */
+:root {
+  --ui-motion-fast: 140ms;
+  --ui-motion-base: 220ms;
+  --ui-motion-slow: 300ms;
+  --ui-motion-ease: cubic-bezier(.22, 1, .36, 1);
+  --ui-motion-soft: cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Persistent page viewport.
+   Pages are mounted once and stacked in the same stable compositor/layout box.
+   Navigation never creates an empty viewport and never animates the entire page. */
+#app-views {
+  position: relative !important;
+  isolation: isolate;
+  contain: layout style;
+}
+
+#app-views > .app-module {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+  will-change: auto !important;
+}
+
+#app-views > .app-module.hidden {
+  display: flex !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#app-views > .app-module.route-active {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 1;
+}
+
+#app-views > #app-settings.settings-root {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Release-wide page entrance motion. The page viewport stays mounted and
+   stable; only its first-level content gets a short paint-friendly entrance. */
+.app-module.route-active > .graphite-route-item-enter {
+  animation: graphite-page-enter 260ms var(--ui-motion-ease) both;
+}
+@keyframes graphite-page-enter {
+  from { opacity: .78; transform: translate3d(0, 5px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Navigation remains animated, while the route viewport itself stays stable. */
+.app-module.route-active .ui-route-enter,
+.app-module.route-active .ui-content-enter {
+  animation: ui-route-content-enter var(--ui-motion-base) var(--ui-motion-ease) both;
+}
+
+@keyframes ui-route-content-enter {
+  from { opacity: .82; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Navigation micro-interactions. */
+.nav-item,
+.nav-section-header,
+.mobile-bottom-nav__item,
+.mob-icon-btn {
+  transition:
+    color var(--ui-motion-fast) var(--ui-motion-soft),
+    background-color var(--ui-motion-fast) var(--ui-motion-soft),
+    border-color var(--ui-motion-fast) var(--ui-motion-soft),
+    box-shadow var(--ui-motion-fast) var(--ui-motion-soft),
+    transform var(--ui-motion-fast) var(--ui-motion-soft);
+}
+.nav-item:hover { transform: translateX(2px); }
+.nav-item.active-nav { animation: ui-nav-active var(--ui-motion-base) var(--ui-motion-ease) both; }
+@keyframes ui-nav-active {
+  from { opacity: .72; transform: translateX(-3px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.nav-section-chevron {
+  transition: transform var(--ui-motion-base) var(--ui-motion-ease);
+}
+.nav-section.collapsed .nav-section-chevron { transform: rotate(-90deg); }
+
+/* Generic interactive feedback for controls that already exist in the app. */
+button,
+[role="button"],
+a {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: var(--ui-motion-fast);
+  transition-timing-function: var(--ui-motion-soft);
+}
+button:active:not(:disabled),
+[role="button"]:active,
+a:active { transform: scale(.985); }
+button:disabled { transition: opacity var(--ui-motion-fast) ease; }
+
+/* Cards and common list rows get a restrained lift, without affecting layout. */
+.ui-card-hover:hover,
+.app-module .hover\:shadow-lg:hover {
+  transform: translateY(-2px);
+}
+
+/* Modal / overlay entrance. Existing hidden classes remain authoritative. */
+.fixed.inset-0:not(.hidden) > .glass-sidebar,
+.fixed.inset-0:not(.hidden) > [class*="rounded-"] {
+  animation: ui-modal-enter var(--ui-motion-base) var(--ui-motion-ease) both;
+}
+@keyframes ui-modal-enter {
+  from { opacity: 0; transform: translateY(8px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Dropdowns/popovers: animate only when they are visibly opened. */
+#ws-dropdown:not(.hidden),
+#cmd-palette:not(.hidden),
+.dropdown-menu:not(.hidden),
+[role="menu"]:not(.hidden) {
+  animation: ui-popover-enter var(--ui-motion-fast) var(--ui-motion-ease) both;
+  transform-origin: top center;
+}
+@keyframes ui-popover-enter {
+  from { opacity: 0; transform: translateY(-4px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Mobile sidebar/overlay: preserve the existing translate classes while adding polish. */
+#main-sidebar { transition: transform var(--ui-motion-slow) var(--ui-motion-ease), box-shadow var(--ui-motion-base) ease; }
+#mobile-overlay { transition: opacity var(--ui-motion-base) var(--ui-motion-soft), visibility var(--ui-motion-base) var(--ui-motion-soft); }
+.mobile-bottom-nav { transition: transform var(--ui-motion-base) var(--ui-motion-ease), box-shadow var(--ui-motion-base) ease; }
+.mobile-bottom-nav__item.active,
+.mobile-bottom-nav__item[aria-current="page"] { animation: ui-bottom-nav-pop var(--ui-motion-base) var(--ui-motion-ease) both; }
+@keyframes ui-bottom-nav-pop {
+  from { transform: translateY(2px); }
+  to { transform: translateY(0); }
+}
+
+/* Inputs and search feel responsive without being distracting. */
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  transition: border-color var(--ui-motion-fast) ease, box-shadow var(--ui-motion-fast) ease, background-color var(--ui-motion-fast) ease;
+}
+
+/* Normalize remaining native select chrome. Date/time inputs intentionally keep
+   their OS picker because that is the accessible native control for those types. */
+select:not(.hidden):not([data-custom-select]) {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, rgb(var(--text-muted)) 50%),
+                    linear-gradient(135deg, rgb(var(--text-muted)) 50%, transparent 50%);
+  background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 30px;
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* Internationalization: keep CJK glyphs crisp and preserve responsive text wrapping. */
+:lang(ja) body,
+:lang(ja) button,
+:lang(ja) input,
+:lang(ja) textarea,
+:lang(ja) select {
+  font-family: "Noto Sans JP", "Noto Sans CJK JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", system-ui, sans-serif;
+  line-break: strict;
+}
+#language-select { min-height: 40px; }
+@media (max-width: 640px) {
+  #language-select { width: 100%; }
+}
+
+/* ---- Custom language picker (avoids native browser <select> UI) ---- */
+.language-picker { position: relative; min-width: 190px; }
+.language-picker-trigger {
+  width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 0 13px; border: 1px solid rgb(var(--border-color) / .9); border-radius: 10px;
+  background: rgb(var(--bg-dark) / .85); color: rgb(var(--text-main)); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .12s ease;
+}
+.language-picker-trigger:hover { border-color: rgb(var(--accent) / .55); background: rgb(var(--bg-dark) / 1); }
+.language-picker-trigger:active { transform: translateY(1px); }
+.language-picker-trigger:focus-visible { outline: 2px solid rgb(var(--accent) / .8); outline-offset: 2px; }
+.language-picker-chevron { opacity: .65; font-size: 15px; transition: transform .18s ease; }
+.language-picker-trigger[aria-expanded="true"] .language-picker-chevron { transform: rotate(180deg); }
+.language-picker-menu {
+  position: fixed; z-index: 100000; top: 0; left: 0; width: 190px; min-width: 190px;
+  padding: 6px; border: 1px solid rgb(var(--border-color) / .95); border-radius: 12px;
+  background: rgb(var(--bg-main) / .97); box-shadow: 0 18px 45px rgb(0 0 0 / .28); backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  opacity: 0; visibility: hidden; transform: translateY(-5px) scale(.98); transform-origin: top right;
+  transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+  box-sizing: border-box;
+}
+.language-picker-menu.is-open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+.language-option {
+  width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: rgb(var(--text-main));
+  text-align: left; font-size: 13px; cursor: pointer; transition: background-color .14s ease, color .14s ease;
+}
+.language-option:hover { background: rgb(var(--accent) / .10); }
+.language-option.is-active { background: rgb(var(--accent) / .14); color: rgb(var(--accent)); font-weight: 700; }
+.language-option [data-language-check] { width: 16px; text-align: center; }
+@media (max-width: 767px) {
+  .language-picker { width: 100%; min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .language-picker-trigger, .language-picker-chevron, .language-picker-menu, .language-option { transition: none; }
+}
+
+/* Settings mobile header integration: the back affordance belongs to the
+   global mobile chrome, not inside the scrolling Settings content. */
+@media (max-width: 767px) {
+  #mobile-header .mobile-settings-back[hidden] { display: none !important; }
+  #mobile-header .mobile-settings-back:not([hidden]) { display: inline-flex; }
+  #mobile-header.settings-detail-active .mobile-settings-back {
+    color: rgb(var(--accent));
+    border-color: rgb(var(--accent) / .16);
+    background: rgb(var(--accent) / .06);
+  }
+  #mobile-header.settings-detail-active .mobile-menu-button { display: none !important; }
+}

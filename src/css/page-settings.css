@@ -1,0 +1,386 @@
+/* ============================================================================
+   Graphite Settings — v2
+   Purpose: a self-contained Settings surface that does not depend on the
+   app's page/grid sizing or Tailwind for its primary layout.
+   ============================================================================ */
+
+#app-settings.settings-root {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+  box-sizing: border-box;
+  z-index: auto !important;
+  isolation: auto;
+  flex: 1 1 auto !important;
+}
+
+#app-settings .settings-shell {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 34px 34px 48px !important;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+#app-settings .settings-header {
+  width: 100% !important;
+  max-width: 1320px !important;
+  margin: 0 auto 24px !important;
+  box-sizing: border-box;
+}
+
+#app-settings .settings-eyebrow {
+  color: rgb(var(--accent));
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+#app-settings .settings-title {
+  margin: 0;
+  color: rgb(var(--text-main));
+  font-size: clamp(24px, 2vw, 32px);
+  line-height: 1.15;
+  font-weight: 750;
+  letter-spacing: -.03em;
+}
+
+#app-settings .settings-subtitle {
+  margin: 8px 0 0;
+  color: rgb(var(--text-muted));
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* The main layout is flex, not grid. This deliberately avoids min-content grid
+   sizing differences between Chromium, WebKitGTK and mobile WebViews. */
+#app-settings .settings-layout {
+  width: 100% !important;
+  max-width: 1320px !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 24px !important;
+  box-sizing: border-box;
+}
+
+#app-settings .settings-nav {
+  position: sticky;
+  top: 0;
+  flex: 0 0 248px !important;
+  width: 248px !important;
+  min-width: 248px !important;
+  max-width: 248px !important;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid rgb(var(--border-color));
+  border-radius: 18px;
+  background: rgb(var(--bg-sidebar) / .86);
+  box-shadow: 0 14px 38px rgb(0 0 0 / .14);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+#app-settings .settings-nav-section + .settings-nav-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(var(--border-color) / .72);
+}
+
+#app-settings .settings-nav-heading {
+  padding: 6px 10px 8px;
+  color: rgb(var(--text-muted));
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+#app-settings .settings-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+#app-settings .settings-tab-btn {
+  appearance: none;
+  width: 100% !important;
+  min-height: 42px;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: rgb(var(--text-main));
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+#app-settings .settings-tab-btn:hover {
+  background: rgb(var(--text-muted) / .08);
+  border-color: rgb(var(--border-color));
+}
+
+#app-settings .settings-tab-btn:active { transform: scale(.99); }
+
+#app-settings .settings-tab-btn.active {
+  color: rgb(var(--accent));
+  background: rgb(var(--accent) / .13);
+  border-color: rgb(var(--accent) / .3);
+  box-shadow: inset 3px 0 0 rgb(var(--accent));
+}
+
+#app-settings .settings-row-icon {
+  width: 18px;
+  flex: 0 0 18px;
+  text-align: center;
+  opacity: .8;
+}
+
+#app-settings .settings-chevron {
+  display: none;
+  margin-left: auto;
+  color: rgb(var(--text-muted));
+  font-size: 18px;
+  line-height: 1;
+}
+
+#app-settings .settings-panels {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box;
+}
+
+#app-settings .settings-panel {
+  display: block;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box;
+  padding: 0 0 8px;
+}
+
+#app-settings .settings-panel.hidden { display: none !important; }
+
+#app-settings .settings-panel > * {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+
+#app-settings .settings-panel .grid {
+  width: 100%;
+  min-width: 0;
+}
+
+#app-settings .settings-panel input,
+#app-settings .settings-panel textarea,
+#app-settings .settings-panel button,
+#app-settings .settings-panel select {
+  box-sizing: border-box;
+}
+
+#app-settings .settings-panel .glass-sidebar,
+#app-settings .settings-panel > .border {
+  border-radius: 16px;
+}
+
+/* Make all existing cards glass-aware without requiring a specific preset. */
+#app-settings .glass-sidebar,
+#app-settings .glass-bg,
+#app-settings .settings-nav {
+  background-color: rgb(var(--bg-sidebar) / var(--glass-surface-opacity, .82));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background-clip: padding-box;
+}
+
+#app-settings .settings-mobile-topbar { display: none; }
+
+@media (max-width: 900px) and (min-width: 768px) {
+  #app-settings.settings-root { left: 256px !important; }
+  #app-settings .settings-shell { padding-inline: 20px !important; }
+  #app-settings .settings-layout { gap: 16px !important; }
+  #app-settings .settings-nav {
+    flex-basis: 210px !important;
+    width: 210px !important;
+    min-width: 210px !important;
+    max-width: 210px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #app-settings.settings-root {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  #app-settings .settings-shell {
+    padding: 18px 14px 92px !important;
+  }
+
+  #app-settings .settings-header {
+    margin-bottom: 16px !important;
+  }
+
+  #app-settings .settings-title { font-size: 24px; }
+  #app-settings .settings-subtitle { font-size: 12px; }
+
+  #app-settings .settings-layout {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  #app-settings .settings-nav {
+    position: static;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  #app-settings .settings-nav-section { margin-bottom: 18px; }
+  #app-settings .settings-nav-section + .settings-nav-section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  #app-settings .settings-nav-heading { padding: 0 6px 7px; }
+
+  #app-settings .settings-nav-list {
+    border: 1px solid rgb(var(--border-color));
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgb(var(--bg-sidebar) / .88);
+  }
+
+  #app-settings .settings-tab-btn {
+    min-height: 50px;
+    border: 0;
+    border-bottom: 1px solid rgb(var(--border-color));
+    border-radius: 0;
+    padding: 13px 14px;
+    font-size: 14px;
+  }
+
+  #app-settings .settings-tab-btn:last-child { border-bottom: 0; }
+  #app-settings .settings-tab-btn.active {
+    color: rgb(var(--text-main));
+    background: rgb(var(--accent) / .09);
+    box-shadow: inset 3px 0 0 rgb(var(--accent));
+  }
+  #app-settings .settings-chevron { display: block; }
+
+  #app-settings:not(.settings-mobile-detail) #settings-panels-wrap { display: none !important; }
+  #app-settings.settings-mobile-detail #settings-nav { display: none !important; }
+  #app-settings.settings-mobile-detail .settings-header { display: none !important; }
+
+  #app-settings.settings-mobile-detail #settings-mobile-topbar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    margin-bottom: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 5px 0;
+    background: rgb(var(--bg-main) / .88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  #app-settings.settings-mobile-detail #settings-mobile-title {
+    margin: 0 auto;
+    padding-right: 62px;
+    color: rgb(var(--text-main));
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  #app-settings .settings-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    min-height: 36px;
+    padding: 6px 8px;
+    border: 0;
+    background: transparent;
+    color: rgb(var(--text-main));
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 10px;
+    color: rgb(var(--accent));
+  }
+  #app-settings .settings-back-btn:hover { background: rgb(var(--accent) / .08); }
+  #app-settings .settings-back-btn:active { transform: scale(.98); }
+
+  #app-settings.settings-mobile-detail .settings-panels,
+  #app-settings.settings-mobile-detail .settings-panel {
+    width: 100% !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app-settings .settings-tab-btn { transition: none; }
+}
+
+/* Page lifecycle: Settings must never paint while its module is hidden.
+   Navigation owns the active/hidden state; this only makes the CSS state
+   deterministic during the switch so the old page cannot show through it. */
+#app-settings.settings-root.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#app-settings.settings-root:not(.hidden) {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+
+/* On mobile, Settings detail navigation uses the global app header. The
+   older in-page topbar remains available for non-mobile layouts only. */
+@media (max-width: 767px) {
+  #app-settings.settings-mobile-detail #settings-mobile-topbar { display: none !important; }
+  #app-settings.settings-mobile-detail .settings-shell { padding-top: 12px !important; }
+}

@@ -1,0 +1,62 @@
+<section id="app-canvas" class="app-module hidden h-full w-full relative">
+    <canvas id="whiteboard" class="w-full h-full absolute inset-0"></canvas>
+    <div class="absolute top-4 left-4 glass-sidebar border border-borderDark p-1.5 rounded-lg flex items-center gap-1 md:gap-2 shadow-lg z-40 flex-wrap max-w-[calc(100vw-2rem)]">
+        <button onclick="setTool('pan', this)" data-tool="pan" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5" title="Pan (1)"><span class="hotkey-badge">1</span>Pan</button>
+        <div class="w-px h-5 bg-borderDark mx-0.5"></div>
+        <button onclick="setTool('draw', this)" data-tool="draw" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5 tool-active" title="Draw (2)"><span class="hotkey-badge">2</span>Draw</button>
+        <button onclick="setTool('rect', this)" data-tool="rect" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5" title="Rect (3)"><span class="hotkey-badge">3</span>Rect</button>
+        <button onclick="setTool('circle', this)" data-tool="circle" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5" title="Circle (4)"><span class="hotkey-badge">4</span>Circle</button>
+        <button onclick="setTool('line', this)" data-tool="line" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5" title="Line (5)"><span class="hotkey-badge">5</span>Line</button>
+        <button onclick="setTool('text', this)" data-tool="text" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5" title="Text (6)"><span class="hotkey-badge">6</span>Text</button>
+        <button onclick="setTool('sticky', this)" data-tool="sticky" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5" title="Sticky (7)"><span class="hotkey-badge">7</span>Sticky</button>
+        <div class="w-px h-5 bg-borderDark mx-0.5"></div>
+        <!-- ERASER -->
+        <div class="relative flex items-center gap-1" id="eraser-wrap">
+            <button onclick="setTool('eraser', this)" data-tool="eraser" id="eraser-btn" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5" title="Eraser (8)">
+                <span class="hotkey-badge">8</span>
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 20H7L3 16l10-10 7 7-3.5 3.5"/><path d="M6.5 17.5l4-4"/>
+                </svg>
+                Erase
+            </button>
+            <!-- Eraser size - custom range -->
+            <div id="eraser-size-wrap" class="hidden items-center gap-1.5">
+                <span class="text-[10px] text-textMuted">Size</span>
+                <input type="range" min="5" max="80" value="20" id="eraser-size-slider"
+                       oninput="updateEraserSize(this.value)"
+                       class="crange w-16">
+                <span id="eraser-size-label" class="text-[10px] text-textMuted font-mono w-6">20</span>
+            </div>
+        </div>
+        <!-- FILL BUCKET -->
+        <button onclick="setTool('fill', this)" data-tool="fill" id="fill-btn" class="canvas-btn px-2 py-1.5 text-xs rounded hover:bg-black/20 flex items-center gap-1.5" title="Fill Shape (9) — click inside any closed rect, circle, or sticky to fill it">
+            <span class="hotkey-badge">9</span>
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 11l-8-8-8.5 8.5a5.5 5.5 0 007.78 7.78L19 11z"/>
+                <path d="M20 16s0 5 2.5 5-2.5 0-2.5 0z"/>
+            </svg>
+            Fill
+        </button>
+        <div class="w-px h-5 bg-borderDark mx-0.5"></div>
+        <!-- Color picker for whiteboard strokes -->
+        <div class="relative flex items-center gap-1.5" title="Stroke color">
+            <label class="text-[10px] text-textMuted font-semibold">Color</label>
+            <label class="ccolor" title="Pick color">
+                <span id="canvas-color-swatch" class="ccolor-swatch" style="width:22px;height:22px;background:#8b5cf6"></span>
+                <input type="color" id="canvas-color-picker" value="#8b5cf6" oninput="setCanvasColor(this.value); document.getElementById('canvas-color-swatch').style.background=this.value">
+            </label>
+            <div class="flex gap-1 items-center">
+                <button onclick="setCanvasColorPreset('#ef4444'); document.getElementById('canvas-color-swatch').style.background='#ef4444'" class="w-3.5 h-3.5 rounded-full hover:scale-125 transition-transform" style="background:#ef4444" title="Red"></button>
+                <button onclick="setCanvasColorPreset('#f59e0b'); document.getElementById('canvas-color-swatch').style.background='#f59e0b'" class="w-3.5 h-3.5 rounded-full hover:scale-125 transition-transform" style="background:#f59e0b" title="Amber"></button>
+                <button onclick="setCanvasColorPreset('#10b981'); document.getElementById('canvas-color-swatch').style.background='#10b981'" class="w-3.5 h-3.5 rounded-full hover:scale-125 transition-transform" style="background:#10b981" title="Green"></button>
+                <button onclick="setCanvasColorPreset('#3b82f6'); document.getElementById('canvas-color-swatch').style.background='#3b82f6'" class="w-3.5 h-3.5 rounded-full hover:scale-125 transition-transform" style="background:#3b82f6" title="Blue"></button>
+                <button onclick="setCanvasColorPreset('#ffffff'); document.getElementById('canvas-color-swatch').style.background='#ffffff'" class="w-3.5 h-3.5 rounded-full hover:scale-125 transition-transform border border-borderDark" style="background:#ffffff" title="White"></button>
+                <button id="canvas-accent-btn" onclick="useAccentColor()" class="w-3.5 h-3.5 rounded-full hover:scale-125 transition-transform border-2 border-white/40" style="background:rgb(var(--accent))" title="Use theme accent"></button>
+            </div>
+        </div>
+        <div class="w-px h-5 bg-borderDark mx-0.5"></div>
+        <button onclick="clearCanvas()" class="px-2 py-1.5 text-xs rounded hover:bg-red-900/40 text-red-400">Clear</button>
+        <div class="w-px h-5 bg-borderDark mx-0.5"></div>
+        <button onclick="exportCanvas()" class="px-2 py-1.5 text-xs rounded hover:bg-black/20 text-textMuted" title="Export as PNG">Export</button>
+    </div>
+</section>

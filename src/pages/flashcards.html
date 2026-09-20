@@ -1,0 +1,168 @@
+<section id="app-flashcards" class="app-module hidden p-4 md:p-8 flex flex-col items-center justify-start relative overflow-y-auto">
+    <div class="w-full max-w-2xl mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-xl md:text-2xl font-bold text-textMain drop-shadow-sm">Mock Questions</h2>
+            <div id="srs-status" class="text-xs text-textMuted mt-1">0 cards due for review today.</div>
+        </div>
+        <div class="flex gap-2 flex-wrap items-center">
+            <!-- Question type toggle -->
+            <div class="flex p-0.5 glass-sidebar border border-borderDark rounded-lg">
+                <button onclick="setQuestionType('flashcard')" id="qtype-flashcard" class="qtype-btn px-3 py-1.5 text-xs rounded-md font-semibold transition qtype-active">Flashcard</button>
+                <button onclick="setQuestionType('mc')" id="qtype-mc" class="qtype-btn px-3 py-1.5 text-xs rounded-md font-semibold transition text-textMuted">Multiple Choice</button>
+            </div>
+            <button onclick="showFlashcardStats()" class="glass-sidebar border border-borderDark text-textMuted px-3 py-1.5 rounded-lg text-sm hover:bg-black/20">Stats</button>
+            <button onclick="addFlashcard()" class="glass-sidebar border border-borderDark text-textMain px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-black/20">+ Add Card</button>
+        </div>
+    </div>
+
+    <!-- SRS Stats Panel -->
+    <div id="srs-stats-panel" class="hidden w-full max-w-2xl mb-4 glass-sidebar border border-borderDark rounded-xl p-4 shadow-sm">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+            <div class="glass-bg rounded-lg p-3 border border-borderDark text-center">
+                <div id="srs-stat-total" class="text-xl font-light text-textMain">0</div>
+                <div class="text-[10px] text-textMuted uppercase mt-1">Total Cards</div>
+            </div>
+            <div class="glass-bg rounded-lg p-3 border border-borderDark text-center">
+                <div id="srs-stat-due" class="text-xl font-light text-accent">0</div>
+                <div class="text-[10px] text-textMuted uppercase mt-1">Due Today</div>
+            </div>
+            <div class="glass-bg rounded-lg p-3 border border-borderDark text-center">
+                <div id="srs-stat-retention" class="text-xl font-light text-mint">—</div>
+                <div class="text-[10px] text-textMuted uppercase mt-1">Retention</div>
+            </div>
+            <div class="glass-bg rounded-lg p-3 border border-borderDark text-center">
+                <div id="srs-stat-mature" class="text-xl font-light text-orange-400">0</div>
+                <div class="text-[10px] text-textMuted uppercase mt-1">Mature Cards</div>
+            </div>
+        </div>
+        <div>
+            <div class="text-[10px] text-textMuted uppercase tracking-wider mb-2">Struggling Cards (lowest ease)</div>
+            <div id="srs-weak-cards" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- ── FLASHCARD MODE (BrainDeck Stack UI) ── -->
+    <div id="flashcard-mode-wrap" class="w-full max-w-4xl flex flex-col items-center">
+        <!-- Stack wrapper with depth cards -->
+        <div class="relative w-full" style="min-height:clamp(360px, 55vh, 640px);">
+            <!-- Background stack cards -->
+            <div id="fc-stack-2" class="absolute inset-0 w-full h-full glass-sidebar border border-borderDark rounded-2xl translate-y-4 scale-[0.92] opacity-30 pointer-events-none transition-opacity duration-300 shadow-sm" style="z-index:0;"></div>
+            <div id="fc-stack-1" class="absolute inset-0 w-full h-full glass-sidebar border border-borderDark rounded-2xl translate-y-2 scale-[0.96] opacity-60 pointer-events-none transition-opacity duration-300 shadow-sm" style="z-index:1;"></div>
+
+            <!-- Main flip card container -->
+            <div id="flashcard-container" class="relative w-full perspective-1000 cursor-pointer" style="min-height:clamp(360px, 55vh, 640px);z-index:10;" onclick="flipCard()">
+                <div id="fc-inner" class="relative w-full h-full transition-transform duration-700 transform-style-3d" style="min-height:clamp(360px, 55vh, 640px);">
+                    <!-- Front -->
+                    <div class="absolute inset-0 glass-sidebar border border-borderDark rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-xl backface-hidden" style="min-height:clamp(360px, 55vh, 640px);">
+                        <div class="absolute top-4 left-4 text-[10px] text-accent uppercase font-bold px-2 py-1 bg-accent/10 rounded">Question</div>
+                        <div id="fc-front-meta" class="absolute top-4 right-4 flex items-center gap-1.5 text-[10px] font-mono text-textMuted"></div>
+                        <div id="fc-front-content" class="prose max-w-none w-full text-lg md:text-xl font-medium leading-relaxed break-words text-textMain overflow-y-auto max-h-full py-4">No cards due. You're all caught up!</div>
+                    </div>
+                    <!-- Back -->
+                    <div class="absolute inset-0 glass-sidebar border border-borderDark rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-xl backface-hidden rotate-y-180" style="min-height:clamp(360px, 55vh, 640px);background:rgba(var(--accent),0.08);">
+                        <div class="absolute top-4 left-4 text-[10px] text-mint uppercase font-bold px-2 py-1 bg-mint/10 rounded">Answer</div>
+                        <div id="fc-back-meta" class="absolute top-4 right-4 flex items-center gap-1.5 text-[10px] font-mono text-textMuted"></div>
+                        <div id="fc-back-content" class="prose max-w-none w-full text-lg md:text-xl font-medium leading-relaxed break-words text-textMain overflow-y-auto max-h-full py-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="w-full mt-8 flex flex-col gap-1.5">
+            <div class="w-full h-2 bg-bgDark border border-borderDark rounded-full overflow-hidden">
+                <div id="fc-progress-bar" class="h-full bg-accent rounded-full transition-all duration-300" style="width:0%"></div>
+            </div>
+            <div id="fc-nav-status" class="text-[10px] font-mono text-textMuted text-right tracking-wider">0 / 0</div>
+        </div>
+        <p id="fc-hint-text" class="mt-2 text-[10px] text-textMuted font-medium tracking-wide uppercase">Click card to flip</p>
+
+        <!-- SRS grading controls (shown after flip) -->
+        <div id="srs-controls" class="hidden flex-col sm:flex-row gap-3 mt-4 w-full justify-center">
+            <button onclick="gradeCard(1)" class="flex-1 py-3 glass-sidebar border-l-4 sm:border-l-0 sm:border-b-4 border-red-500 text-textMain rounded-lg hover:bg-black/20 text-sm font-semibold transition">Again (1m)</button>
+            <button onclick="gradeCard(2)" class="flex-1 py-3 glass-sidebar border-l-4 sm:border-l-0 sm:border-b-4 border-orange-400 text-textMain rounded-lg hover:bg-black/20 text-sm font-semibold transition">Hard</button>
+            <button onclick="gradeCard(3)" class="flex-1 py-3 glass-sidebar border-l-4 sm:border-l-0 sm:border-b-4 border-mint text-textMain rounded-lg hover:bg-black/20 text-sm font-semibold transition">Good</button>
+            <button onclick="gradeCard(4)" class="flex-1 py-3 glass-sidebar border-l-4 sm:border-l-0 sm:border-b-4 border-blue-400 text-textMain rounded-lg hover:bg-black/20 text-sm font-semibold transition">Easy</button>
+        </div>
+    </div>
+
+    <!-- ── MULTIPLE CHOICE MODE ── -->
+    <div id="mc-mode-wrap" class="hidden w-full max-w-2xl flex flex-col gap-4">
+        <!-- Config bar -->
+        <div class="flex flex-wrap items-center gap-3 glass-sidebar border border-borderDark rounded-xl px-4 py-3">
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-textMuted font-semibold whitespace-nowrap">Source:</label>
+                <div class="csel" onclick="event.stopPropagation()">
+                    <select id="mc-source" class="hidden">
+                        <option value="notes">My Notes</option>
+                        <option value="cards">My Flashcards</option>
+                        <option value="both">Notes + Cards</option>
+                    </select>
+                    <button id="mc-source-btn" class="csel-btn sm" onclick="cselToggle('mc-source',event)">
+                        <span class="csel-label">My Notes</span>
+                        <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
+                    </button>
+                    <div id="mc-source-dd" class="csel-dropdown">
+                        <div class="csel-option selected" data-val="notes" onclick="cselChoose('mc-source','notes','My Notes')">My Notes</div>
+                        <div class="csel-option" data-val="cards" onclick="cselChoose('mc-source','cards','My Flashcards')">My Flashcards</div>
+                        <div class="csel-option" data-val="both" onclick="cselChoose('mc-source','both','Notes + Cards')">Notes + Cards</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-textMuted font-semibold whitespace-nowrap">Questions:</label>
+                <div class="csel" onclick="event.stopPropagation()">
+                    <select id="mc-count" class="hidden">
+                        <option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option>
+                    </select>
+                    <button id="mc-count-btn" class="csel-btn sm" onclick="cselToggle('mc-count',event)">
+                        <span class="csel-label">10</span>
+                        <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
+                    </button>
+                    <div id="mc-count-dd" class="csel-dropdown">
+                        <div class="csel-option" data-val="5"  onclick="cselChoose('mc-count','5','5')">5</div>
+                        <div class="csel-option selected" data-val="10" onclick="cselChoose('mc-count','10','10')">10</div>
+                        <div class="csel-option" data-val="15" onclick="cselChoose('mc-count','15','15')">15</div>
+                        <div class="csel-option" data-val="20" onclick="cselChoose('mc-count','20','20')">20</div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="startMCSession()" id="mc-gen-btn" class="ml-auto px-4 py-1.5 bg-accent text-white text-xs font-bold rounded-lg hover:opacity-90 transition flex items-center gap-2">
+                <span id="mc-gen-icon">✦</span> Generate Questions
+            </button>
+        </div>
+
+        <!-- Score bar (shown during session) -->
+        <div id="mc-score-bar" class="hidden flex items-center justify-between px-4 py-2 glass-sidebar border border-borderDark rounded-xl text-xs">
+            <span class="text-textMuted">Question <span id="mc-q-num">1</span> of <span id="mc-q-total">10</span></span>
+            <span class="font-semibold text-textMain">Score: <span id="mc-score" class="text-accent">0</span> / <span id="mc-score-total">0</span></span>
+        </div>
+
+        <!-- Question card -->
+        <div id="mc-question-card" class="hidden glass-sidebar border border-borderDark rounded-2xl p-6 shadow-xl">
+            <div class="text-[10px] text-accent uppercase font-bold tracking-wider mb-3">Multiple Choice</div>
+            <div id="mc-question-text" class="text-base md:text-lg font-medium text-textMain mb-5 leading-relaxed"></div>
+            <div id="mc-options" class="flex flex-col gap-2.5"></div>
+            <div id="mc-explanation" class="hidden mt-4 p-3 rounded-xl bg-bgDark border border-borderDark text-sm text-textMuted leading-relaxed"></div>
+            <div class="flex justify-end mt-4">
+                <button id="mc-next-btn" onclick="mcNextQuestion()" class="hidden px-5 py-2 bg-accent text-white font-bold rounded-xl text-sm hover:opacity-90 transition">Next →</button>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="mc-empty" class="flex flex-col items-center justify-center py-12 gap-3 text-center">
+            <p class="text-4xl font-semibold text-textMain">AI Multiple Choice</p>
+            <p class="text-xs text-textMuted max-w-xs">AI generates questions from your notes or flashcards. Choose your source and hit Generate.</p>
+        </div>
+
+        <!-- Results screen -->
+        <div id="mc-results" class="hidden glass-sidebar border border-borderDark rounded-2xl p-6 text-center shadow-xl">
+            <div class="text-4xl mb-3" id="mc-result-emoji">🎉</div>
+            <div class="text-2xl font-bold text-textMain mb-1" id="mc-result-score"></div>
+            <div class="text-sm text-textMuted mb-5" id="mc-result-label"></div>
+            <div id="mc-result-breakdown" class="text-left space-y-2 mb-5 max-h-64 overflow-y-auto"></div>
+            <button onclick="startMCSession()" class="px-6 py-2.5 bg-accent text-white font-bold rounded-xl text-sm hover:opacity-90 transition">Try Again ✦</button>
+        </div>
+
+    </div>
+</section>
