@@ -4,12 +4,13 @@
 const NotifSystem = (() => {
 
     const TYPE_META = {
-        srReview:     { label: 'Spaced Repetition & Quiz Reviews', icon: '🧠', desc: 'Flashcards due for review based on their SM-2 interval.' },
-        focusHabit:   { label: 'Focus & Habit Reminders',          icon: '⏱️', desc: 'Scheduled study blocks starting soon, break timers, and daily focus goal progress.' },
-        taskDeadline: { label: 'Task Deadlines & Daily Digest',    icon: '✅', desc: 'Kanban tasks approaching their due date, plus a morning summary.' },
-        calendarAlert:{ label: 'Calendar Event Alerts',            icon: '📅', desc: 'Pre-event countdowns (e.g. 15m / 1h before a scheduled block).' },
-        inactiveNotes:{ label: 'Inactive Note Follow-ups',         icon: '🗒️', desc: 'Notes that are unlinked or untouched for 14+ days.' }
+        srReview:     { labelKey: 'Review reminders', icon: 'SR', descKey: 'Cards that are ready for review.' },
+        focusHabit:   { labelKey: 'Focus reminders', icon: 'FO', descKey: 'Upcoming focus blocks, break timers, and daily focus progress.' },
+        taskDeadline: { labelKey: 'Task reminders', icon: 'TD', descKey: 'Tasks that are coming due, plus a daily summary.' },
+        calendarAlert:{ labelKey: 'Calendar reminders', icon: 'CA', descKey: 'Reminders before scheduled events.' },
+        inactiveNotes:{ labelKey: 'Note follow-ups', icon: 'NT', descKey: 'Notes that have not been touched for a while.' }
     };
+    const t = (key) => window.GraphiteI18n?.t ? window.GraphiteI18n.t(key, key) : key;
 
     const DEFAULTS = {
         masterEnabled: true,
@@ -162,16 +163,16 @@ const NotifSystem = (() => {
     function showInAppToast(typeKey, title, body, onClick) {
         const stack = document.getElementById('notif-toast-stack');
         if (!stack) { toast(title, 'info'); return; }
-        const meta = TYPE_META[typeKey] || { icon: '🔔' };
+        const meta = TYPE_META[typeKey] || { icon: 'NT' };
         const el = document.createElement('div');
         el.className = 'notif-toast';
         el.innerHTML =
-            '<div class="nt-icon">' + meta.icon + '</div>' +
+            '<div class="nt-icon" aria-hidden="true">' + meta.icon + '</div>' +
             '<div style="flex:1;min-width:0;">' +
                 '<div class="nt-title"></div>' +
                 '<div class="nt-body"></div>' +
             '</div>' +
-            '<div class="nt-close">✕</div>';
+            '<div class="nt-close"></div>';
         el.querySelector('.nt-title').textContent = title;
         el.querySelector('.nt-body').textContent = body || '';
         el.querySelector('.nt-close').addEventListener('click', (e) => { e.stopPropagation(); dismiss(); });

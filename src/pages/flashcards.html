@@ -1,8 +1,9 @@
-<section id="app-flashcards" class="app-module hidden p-4 md:p-8 flex flex-col items-center justify-start relative overflow-y-auto">
-    <div class="w-full max-w-2xl mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <h2 class="text-xl md:text-2xl font-bold text-textMain drop-shadow-sm">Mock Questions</h2>
-            <div id="srs-status" class="text-xs text-textMuted mt-1">0 cards due for review today.</div>
+<section id="app-flashcards" class="app-module hidden mock-questions-page p-4 md:p-6 flex flex-col items-center justify-start relative overflow-y-auto">
+    <div class="w-full max-w-5xl mb-3 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 mock-questions-header">
+        <div class="min-w-0">
+            <div class="text-[10px] uppercase tracking-[0.16em] text-accent font-semibold mb-1">Practice</div>
+            <h2 class="text-xl md:text-2xl font-bold text-textMain">Mock Questions</h2>
+            <div id="srs-status" class="text-xs text-textMuted mt-1">0 cards ready to review.</div>
         </div>
         <div class="flex gap-2 flex-wrap items-center">
             <!-- Question type toggle -->
@@ -10,13 +11,13 @@
                 <button onclick="setQuestionType('flashcard')" id="qtype-flashcard" class="qtype-btn px-3 py-1.5 text-xs rounded-md font-semibold transition qtype-active">Flashcard</button>
                 <button onclick="setQuestionType('mc')" id="qtype-mc" class="qtype-btn px-3 py-1.5 text-xs rounded-md font-semibold transition text-textMuted">Multiple Choice</button>
             </div>
-            <button onclick="showFlashcardStats()" class="glass-sidebar border border-borderDark text-textMuted px-3 py-1.5 rounded-lg text-sm hover:bg-black/20">Stats</button>
-            <button onclick="addFlashcard()" class="glass-sidebar border border-borderDark text-textMain px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-black/20">+ Add Card</button>
+            <button onclick="showFlashcardStats()" class="glass-sidebar border border-borderDark text-textMuted px-3 py-2 rounded-lg text-sm hover:bg-black/20">Stats</button>
+            <button onclick="addFlashcard()" class="bg-accent text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">Add card</button>
         </div>
     </div>
 
     <!-- SRS Stats Panel -->
-    <div id="srs-stats-panel" class="hidden w-full max-w-2xl mb-4 glass-sidebar border border-borderDark rounded-xl p-4 shadow-sm">
+    <div id="srs-stats-panel" class="hidden w-full max-w-5xl mb-3 glass-sidebar border border-borderDark rounded-xl p-4 shadow-sm">
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
             <div class="glass-bg rounded-lg p-3 border border-borderDark text-center">
                 <div id="srs-stat-total" class="text-xl font-light text-textMain">0</div>
@@ -42,18 +43,18 @@
     </div>
 
     <!-- ── FLASHCARD MODE (BrainDeck Stack UI) ── -->
-    <div id="flashcard-mode-wrap" class="w-full max-w-4xl flex flex-col items-center">
+    <div id="flashcard-mode-wrap" class="w-full max-w-5xl flex flex-col items-center">
         <!-- Stack wrapper with depth cards -->
-        <div class="relative w-full" style="min-height:clamp(360px, 55vh, 640px);">
+        <div class="relative w-full" style="min-height:clamp(300px, 43vh, 500px);">
             <!-- Background stack cards -->
             <div id="fc-stack-2" class="absolute inset-0 w-full h-full glass-sidebar border border-borderDark rounded-2xl translate-y-4 scale-[0.92] opacity-30 pointer-events-none transition-opacity duration-300 shadow-sm" style="z-index:0;"></div>
             <div id="fc-stack-1" class="absolute inset-0 w-full h-full glass-sidebar border border-borderDark rounded-2xl translate-y-2 scale-[0.96] opacity-60 pointer-events-none transition-opacity duration-300 shadow-sm" style="z-index:1;"></div>
 
             <!-- Main flip card container -->
-            <div id="flashcard-container" class="relative w-full perspective-1000 cursor-pointer" style="min-height:clamp(360px, 55vh, 640px);z-index:10;" onclick="flipCard()">
-                <div id="fc-inner" class="relative w-full h-full transition-transform duration-700 transform-style-3d" style="min-height:clamp(360px, 55vh, 640px);">
+            <div id="flashcard-container" class="relative w-full perspective-1000 cursor-pointer" style="min-height:clamp(300px, 43vh, 500px);z-index:10;" onclick="flipCard()">
+                <div id="fc-inner" class="relative w-full h-full transition-transform duration-700 transform-style-3d" style="min-height:clamp(300px, 43vh, 500px);">
                     <!-- Front -->
-                    <div class="absolute inset-0 glass-sidebar border border-borderDark rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-xl backface-hidden" style="min-height:clamp(360px, 55vh, 640px);">
+                    <div class="absolute inset-0 glass-sidebar border border-borderDark rounded-2xl flex flex-col items-center justify-center p-6 md:p-8 text-center shadow-xl backface-hidden" style="min-height:clamp(300px, 43vh, 500px);">
                         <div class="absolute top-4 left-4 text-[10px] text-accent uppercase font-bold px-2 py-1 bg-accent/10 rounded">Question</div>
                         <div id="fc-front-meta" class="absolute top-4 right-4 flex items-center gap-1.5 text-[10px] font-mono text-textMuted"></div>
                         <div id="fc-front-content" class="prose max-w-none w-full text-lg md:text-xl font-medium leading-relaxed break-words text-textMain overflow-y-auto max-h-full py-4">No cards due. You're all caught up!</div>
@@ -69,13 +70,13 @@
         </div>
 
         <!-- Progress bar -->
-        <div class="w-full mt-8 flex flex-col gap-1.5">
+        <div class="w-full mt-4 flex flex-col gap-1.5">
             <div class="w-full h-2 bg-bgDark border border-borderDark rounded-full overflow-hidden">
                 <div id="fc-progress-bar" class="h-full bg-accent rounded-full transition-all duration-300" style="width:0%"></div>
             </div>
             <div id="fc-nav-status" class="text-[10px] font-mono text-textMuted text-right tracking-wider">0 / 0</div>
         </div>
-        <p id="fc-hint-text" class="mt-2 text-[10px] text-textMuted font-medium tracking-wide uppercase">Click card to flip</p>
+        <p id="fc-hint-text" class="mt-1 text-[10px] text-textMuted font-medium tracking-wide uppercase">Select the card to reveal the answer</p>
 
         <!-- SRS grading controls (shown after flip) -->
         <div id="srs-controls" class="hidden flex-col sm:flex-row gap-3 mt-4 w-full justify-center">
@@ -87,7 +88,7 @@
     </div>
 
     <!-- ── MULTIPLE CHOICE MODE ── -->
-    <div id="mc-mode-wrap" class="hidden w-full max-w-2xl flex flex-col gap-4">
+    <div id="mc-mode-wrap" class="hidden w-full max-w-5xl flex flex-col gap-3">
         <!-- Config bar -->
         <div class="flex flex-wrap items-center gap-3 glass-sidebar border border-borderDark rounded-xl px-4 py-3">
             <div class="flex items-center gap-2">
@@ -128,7 +129,7 @@
                 </div>
             </div>
             <button onclick="startMCSession()" id="mc-gen-btn" class="ml-auto px-4 py-1.5 bg-accent text-white text-xs font-bold rounded-lg hover:opacity-90 transition flex items-center gap-2">
-                <span id="mc-gen-icon">✦</span> Generate Questions
+                <span id="mc-gen-icon"></span> Generate Questions
             </button>
         </div>
 
@@ -150,18 +151,18 @@
         </div>
 
         <!-- Empty state -->
-        <div id="mc-empty" class="flex flex-col items-center justify-center py-12 gap-3 text-center">
-            <p class="text-4xl font-semibold text-textMain">AI Multiple Choice</p>
-            <p class="text-xs text-textMuted max-w-xs">AI generates questions from your notes or flashcards. Choose your source and hit Generate.</p>
+        <div id="mc-empty" class="flex flex-col items-center justify-center py-8 gap-2 text-center glass-sidebar border border-borderDark rounded-2xl">
+            <p class="text-2xl font-semibold text-textMain">Practice from your material</p>
+            <p class="text-xs text-textMuted max-w-md">Choose a source and number of questions, then start a session.</p>
         </div>
 
         <!-- Results screen -->
         <div id="mc-results" class="hidden glass-sidebar border border-borderDark rounded-2xl p-6 text-center shadow-xl">
-            <div class="text-4xl mb-3" id="mc-result-emoji">🎉</div>
+            <div class="mc-result-mark" id="mc-result-emoji" aria-hidden="true"></div>
             <div class="text-2xl font-bold text-textMain mb-1" id="mc-result-score"></div>
             <div class="text-sm text-textMuted mb-5" id="mc-result-label"></div>
             <div id="mc-result-breakdown" class="text-left space-y-2 mb-5 max-h-64 overflow-y-auto"></div>
-            <button onclick="startMCSession()" class="px-6 py-2.5 bg-accent text-white font-bold rounded-xl text-sm hover:opacity-90 transition">Try Again ✦</button>
+            <button onclick="startMCSession()" class="px-6 py-2.5 bg-accent text-white font-bold rounded-xl text-sm hover:opacity-90 transition">Try again</button>
         </div>
 
     </div>

@@ -1527,3 +1527,39 @@ textarea,
 @media(max-width:900px){.theme-palette-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
 @media(max-width:640px){.theme-palette-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.theme-palette-btn{min-height:46px;padding:10px 8px}.theme-palette-btn-swatches{display:none}.theme-palette-pagination{margin-top:10px}}
 @media(prefers-reduced-motion:reduce){.theme-palette-btn,.theme-palette-page-btn{transition:none}.theme-palette-btn:hover{transform:none}}
+
+
+/* Mock Questions: compact review workspace */
+.mock-questions-page { gap: 0; }
+.mock-questions-header { position: relative; z-index: 5; }
+.mock-questions-page #flashcard-mode-wrap .relative { min-height: clamp(300px, 43vh, 500px) !important; }
+.mock-questions-page #flashcard-container, .mock-questions-page #fc-inner,
+.mock-questions-page #fc-inner > div { min-height: clamp(300px, 43vh, 500px) !important; }
+.mock-questions-page #fc-front-content, .mock-questions-page #fc-back-content { max-height: 34vh; }
+.mock-questions-page #mc-question-card { padding: 1.1rem; }
+.mock-questions-page #mc-empty { min-height: 170px; }
+.mc-result-mark { width: 34px; height: 34px; margin: 0 auto 10px; border-radius: 10px; border: 2px solid rgb(var(--accent)); position:relative; }
+.mc-result-mark::after { content:""; position:absolute; width:9px; height:16px; border-right:2px solid rgb(var(--accent)); border-bottom:2px solid rgb(var(--accent)); transform:rotate(45deg); left:10px; top:5px; }
+
+/* Whiteboard sticky notes */
+.sticky-editor { background: rgb(var(--bg-sidebar)); color: rgb(var(--text-main)); border:1px solid rgb(var(--border-color)); border-radius:14px; box-shadow:0 18px 50px rgba(0,0,0,.45); overflow:hidden; resize:both; min-width:240px; max-width:min(520px,calc(100vw - 24px)); }
+.sticky-editor-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 11px; background:rgba(var(--accent),.08); border-bottom:1px solid rgb(var(--border-color)); }
+.sticky-editor-drag { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:rgb(var(--text-muted)); cursor:move; user-select:none; }
+.sticky-editor-dot { width:8px; height:8px; border-radius:50%; background:rgb(var(--accent)); box-shadow:0 0 10px rgba(var(--accent),.45); }
+.sticky-editor-actions { display:flex; align-items:center; gap:5px; }
+.sticky-editor-actions button { border:1px solid rgb(var(--border-color)); border-radius:7px; padding:5px 8px; font-size:10px; font-weight:700; cursor:pointer; }
+.sticky-editor-save { background:rgb(var(--accent)); color:#fff; border-color:transparent !important; }
+.sticky-editor-muted { background:transparent; color:rgb(var(--text-muted)); }
+.sticky-editor-danger { background:rgba(239,68,68,.08); color:#f87171; border-color:rgba(239,68,68,.25) !important; }
+.sticky-editor-body { padding:11px; display:flex; flex-direction:column; gap:8px; }
+.sticky-title, .sticky-content { width:100%; box-sizing:border-box; background:rgba(var(--bg-dark),.45); border:1px solid rgb(var(--border-color)); color:rgb(var(--text-main)); border-radius:9px; outline:none; font-family:Inter,sans-serif; }
+.sticky-title { padding:8px 10px; font-size:13px; font-weight:700; }
+.sticky-content { min-height:100px; padding:9px 10px; font-size:13px; line-height:1.55; resize:vertical; }
+.sticky-title:focus, .sticky-content:focus { border-color:rgb(var(--accent)); box-shadow:0 0 0 3px rgba(var(--accent),.08); }
+.sticky-editor-footer { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.sticky-palette { display:flex; gap:5px; }
+.sticky-color { width:18px; height:18px; border-radius:50%; border:2px solid transparent; cursor:pointer; box-shadow:0 0 0 1px rgba(0,0,0,.15); }
+.sticky-color.selected { border-color:rgb(var(--text-main)); box-shadow:0 0 0 1px rgb(var(--accent)); }
+.sticky-count, .sticky-shortcut { font-size:9px; color:rgb(var(--text-muted)); }
+.sticky-shortcut { margin-left:auto; }
+@media (max-width:767px) { .sticky-shortcut { display:none; } .mock-questions-page #flashcard-mode-wrap .relative { min-height:320px !important; } .mock-questions-page #flashcard-container, .mock-questions-page #fc-inner, .mock-questions-page #fc-inner > div { min-height:320px !important; } }

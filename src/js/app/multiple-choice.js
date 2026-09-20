@@ -47,7 +47,7 @@
 
             if (!content.trim()) {
                 toast('No notes or cards found. Add some content first.', 'error');
-                btn.disabled = false; icon.textContent = '✦'; return;
+                btn.disabled = false; icon.textContent = ''; return;
             }
 
             const sys = `You are an exam question generator. Based on the study material provided, generate exactly ${count} multiple choice questions.
@@ -85,7 +85,7 @@ Rules:
                 toast('Failed to generate questions: ' + err.message, 'error');
                 document.getElementById('mc-empty').classList.remove('hidden');
             } finally {
-                btn.disabled = false; icon.textContent = '✦';
+                btn.disabled = false; icon.textContent = '';
             }
         }
 
@@ -134,7 +134,7 @@ Rules:
             // Show explanation
             if (q.explanation) {
                 const expEl = document.getElementById('mc-explanation');
-                expEl.textContent = (isRight ? '✓ Correct! ' : '✗ Incorrect. ') + q.explanation;
+                expEl.textContent = (isRight ? ' Correct! ' : ' Incorrect. ') + q.explanation;
                 expEl.style.borderLeft = `3px solid ${isRight ? '#10b981' : '#f43f5e'}`;
                 expEl.classList.remove('hidden');
             }
@@ -153,7 +153,7 @@ Rules:
             document.getElementById('mc-score-bar').classList.add('hidden');
             const total = mcQuestions.length;
             const pct = Math.round((mcCorrect / total) * 100);
-            const emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🎉' : pct >= 50 ? '📚' : '💪';
+            const emoji = pct >= 90 ? '' : pct >= 70 ? '' : pct >= 50 ? '' : '';
             const label = pct >= 90 ? 'Outstanding!' : pct >= 70 ? 'Great work!' : pct >= 50 ? 'Keep studying!' : 'More practice needed.';
             document.getElementById('mc-result-emoji').textContent = emoji;
             document.getElementById('mc-result-score').textContent = `${mcCorrect} / ${total} correct (${pct}%)`;

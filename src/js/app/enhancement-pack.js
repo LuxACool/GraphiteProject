@@ -368,7 +368,7 @@
 
             if (!noteContent.trim()) {
                 toast('No notes found. Write some notes first!');
-                btn.disabled = false; icon.textContent = '✦'; return;
+                btn.disabled = false; icon.textContent = ''; return;
             }
 
             const wantFlashcards = type === 'flashcard' || type === 'both';
@@ -411,13 +411,13 @@
                 }
 
                 saveDataToDB(); updateFlashcardUI(); updateDashboard();
-                resultEl.textContent = '✓ Added ' + addedCount + ' cards to your deck!';
+                resultEl.textContent = ' Added ' + addedCount + ' cards to your deck!';
                 resultEl.classList.remove('hidden');
                 toast('Generated ' + addedCount + ' cards! Head to Mock Questions to review.');
             } catch(err) {
                 toast('Failed to generate cards: ' + err.message);
             } finally {
-                btn.disabled = false; icon.textContent = '✦';
+                btn.disabled = false; icon.textContent = '';
             }
         }
         async function tutorSend(){
@@ -514,7 +514,7 @@
             state.tutorChat[state.tutorChat.length-1] = {role:'assistant', content: answer};
             renderTutorThread(); saveDataToDB(); addXP(5,'tutor');
           } catch(err){
-            state.tutorChat[state.tutorChat.length-1] = {role:'assistant', content:'⚠️ Couldn\'t reach the AI service. '+err.message};
+            state.tutorChat[state.tutorChat.length-1] = {role:'assistant', content:' Couldn\'t reach the AI service. '+err.message};
             renderTutorThread();
           }
         }
@@ -542,7 +542,7 @@
           try {
             soundCtx = new (window.AudioContext||window.webkitAudioContext)();
           } catch(e) {
-            toast('⚠️ Web Audio not available in this browser.', 'error');
+            toast(' Web Audio not available in this browser.', 'error');
             return;
           }
           // Brown noise via filtered random walk
@@ -656,7 +656,7 @@
                 _binauralCtx = new (window.AudioContext || window.webkitAudioContext)();
                 return true;
             } catch(e) {
-                toast('⚠️ Web Audio not supported in this browser.', 'error');
+                toast(' Web Audio not supported in this browser.', 'error');
                 return false;
             }
         }
@@ -828,7 +828,7 @@
 
         async function generateFlashcardFromSelection(text) {
             if (!text || text.length < 10) { toast('Select more text to generate a card.', 'error'); return; }
-            toast('✨ Sending to AI Tutor…');
+            toast(' Sending to AI Tutor…');
 
             const provider = state.settings.aiProvider || 'free';
             const key = state.settings.openaiKey || '';
@@ -874,7 +874,7 @@ Make the question specific and testable. Keep the answer concise (1-3 sentences)
                     sourceNote: state.currentNoteId || null
                 });
                 saveDataToDB(); updateFlashcardUI(); updateDashboard();
-                toast('✅ Flashcard added to your SRS queue!', 'success');
+                toast(' Flashcard added to your SRS queue!', 'success');
             } catch(err) {
                 console.error('AI flashcard error:', err);
                 toast('Failed to generate card — check your AI settings.', 'error');

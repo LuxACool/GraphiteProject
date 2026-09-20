@@ -157,7 +157,7 @@ function startTimer() {
                 if (currentApp === 'dashboard') { calculateStreak(); }
             }
             const _ov1 = document.getElementById('focus-overlay'); _ov1.style.display = ''; _ov1.classList.add('hidden');
-            toast("✅ Work session complete! Time to take a break.", "success"); renderPomoDots(); confettiBurst();
+            toast(" Work session complete! Time to take a break.", "success"); renderPomoDots(); confettiBurst();
             resetTimer();
         }
     }, 1000);

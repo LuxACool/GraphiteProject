@@ -118,14 +118,14 @@ function showAutocomplete(type, query) {
 
     if (type === 'wiki') {
         const available = state.notes.filter(n => n.workspaceId === state.activeWorkspace);
-        ac.innerHTML = available.map(n => `<div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain" onmousedown="event.preventDefault(); insertAc('wiki', '${n.title || 'Untitled'}')">📄 ${n.title || 'Untitled'}</div>`).join('');
+        ac.innerHTML = available.map(n => `<div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain" onmousedown="event.preventDefault(); insertAc('wiki', '${n.title || 'Untitled'}')"> ${n.title || 'Untitled'}</div>`).join('');
         if(available.length === 0) ac.innerHTML = '<div class="px-4 py-2 text-textMuted">No notes available</div>';
     } else if (type === 'slash') {
         ac.innerHTML = `
-            <div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain font-medium" onmousedown="event.preventDefault(); insertAc('slash', 'todo')">☐ Task Checkbox</div>
+            <div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain font-medium" onmousedown="event.preventDefault(); insertAc('slash', 'todo')"> Task Checkbox</div>
             <div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain font-medium" onmousedown="event.preventDefault(); insertAc('slash', 'math')">Σ Math Block</div>
             <div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain font-medium" onmousedown="event.preventDefault(); insertAc('slash', 'table')">⊞ Markdown Table</div>
-            <div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain font-medium" onmousedown="event.preventDefault(); insertAc('slash', 'card')">🗂️ Flashcard Outline</div>
+            <div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain font-medium" onmousedown="event.preventDefault(); insertAc('slash', 'card')"> Flashcard Outline</div>
         `;
     } else if (type === 'tag') {
         // FEATURE: # tag autocomplete from existing note tag pool
@@ -137,7 +137,7 @@ function showAutocomplete(type, query) {
         if (!items.length) { ac.innerHTML = '<div class="px-4 py-2 text-textMuted">No tags yet — keep typing to create one</div>'; return; }
         ac.innerHTML = items.map(t => {
             const clean = t.replace(/\s+\(create new\)$/, '');
-            return `<div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain" onmousedown="event.preventDefault(); insertAc('tag', '${clean.replace(/'/g, "\\'")}')">🏷️ ${t}</div>`;
+            return `<div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain" onmousedown="event.preventDefault(); insertAc('tag', '${clean.replace(/'/g, "\\'")}')"> ${t}</div>`;
         }).join('');
     } else if (type === 'date') {
         // FEATURE: @ date autocomplete — quick links to calendar
@@ -153,7 +153,7 @@ function showAutocomplete(type, query) {
             { label: 'now', value: `${formatLocalDateKey(today)} ${String(today.getHours()).padStart(2,'0')}:${String(today.getMinutes()).padStart(2,'0')}` },
         ].filter(o => !q || o.label.startsWith(q) || o.value.startsWith(q));
         if (!opts.length) { ac.innerHTML = '<div class="px-4 py-2 text-textMuted">Type today / tomorrow / next-week</div>'; return; }
-        ac.innerHTML = opts.map(o => `<div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain" onmousedown="event.preventDefault(); insertAc('date', '${o.value}')">📅 <span class="text-textMuted">${o.label}</span> · ${o.value}</div>`).join('');
+        ac.innerHTML = opts.map(o => `<div class="px-4 py-2 hover:bg-accent/20 cursor-pointer text-textMain" onmousedown="event.preventDefault(); insertAc('date', '${o.value}')"> <span class="text-textMuted">${o.label}</span> · ${o.value}</div>`).join('');
     }
 }
 
@@ -298,7 +298,7 @@ function renderNotesList() {
             <div class="flex justify-between items-center w-full gap-1" onclick="loadNoteIntoEditor('${note.id}')">
                 <span class="note-title-text truncate text-[13px] font-medium ${isActive ? 'text-accent' : 'text-textMain'} flex-1">${safeTitle}</span>
                 ${searchAll && note.workspaceId !== state.activeWorkspace ? `<span class="text-[9px] opacity-50 px-1 border border-borderDark rounded bg-bgDark shrink-0">${safeWsName}</span>` : ''}
-                <button onclick="event.stopPropagation(); deleteNoteById('${note.id}')" class="shrink-0 w-5 h-5 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-red-400/15 text-red-400/60 hover:text-red-400 transition text-xs" title="Delete note">✕</button>
+                <button onclick="event.stopPropagation(); deleteNoteById('${note.id}')" class="shrink-0 w-5 h-5 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-red-400/15 text-red-400/60 hover:text-red-400 transition text-xs" title="Delete note"></button>
             </div>
             ${snippet ? `<div class="text-[11px] text-textMuted truncate" onclick="loadNoteIntoEditor('${note.id}')">${isBodyMatch ? '<span class="text-accent">↳ </span>' : ''}${safeSnippet}</div>` : ''}
             <div class="flex items-center gap-1.5 mt-0.5" onclick="loadNoteIntoEditor('${note.id}')">

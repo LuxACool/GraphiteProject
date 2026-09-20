@@ -87,10 +87,10 @@ function calculateStreak() {
         0:  "Start a session today to begin your streak.",
         1:  "Good start! Come back tomorrow to build momentum.",
         3:  "Three days in — the habit is forming.",
-        7:  "One week strong! 🎯 Keep it going.",
+        7:  "One week strong!  Keep it going.",
         14: "Two weeks — consistency is a superpower.",
-        30: "30 days! You're unstoppable. 🏆",
-        60: "Two months of deep work. Legendary. 🔥",
+        30: "30 days of steady progress.",
+        60: "Two months of consistent work.",
     };
     const msgKey = [60,30,14,7,3,1,0].find(k => current >= k);
     const msgEl = document.getElementById('streak-message');
@@ -107,7 +107,7 @@ function calculateStreak() {
     // Flame animation — pulse when streak is alive
     const flame = el('streak-flame');
     if (flame) {
-        flame.textContent = current >= 7 ? '🔥🔥' : current >= 3 ? '🔥' : current >= 1 ? '✨' : '💤';
+        flame.textContent = current >= 7 ? '' : current >= 3 ? '' : current >= 1 ? '' : '';
         flame.style.animation = current > 0 ? 'flameFlicker 2s ease-in-out infinite' : 'none';
     }
 

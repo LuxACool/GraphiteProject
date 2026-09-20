@@ -77,6 +77,7 @@ document.addEventListener('keydown', (e) => {
     if (typeof currentApp === 'undefined' || currentApp !== 'flashcards') return;
     const modal = document.getElementById('custom-modal');
     if (modal && !modal.classList.contains('hidden')) return; // don't intercept when modal open
+    if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) || e.target.isContentEditable) return;
     if (e.key === 'ArrowRight') { e.preventDefault(); fcNextCard(); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); fcPrevCard(); }
     else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); flipCard(); }

@@ -119,11 +119,11 @@ function applySettings() {
         providerEl.value = provider;
         // sync custom select label
         const providerLabels = {
-            free:'🆓 Free (Pollinations.ai — no key needed)',
-            openai:'🤖 OpenAI (ChatGPT — gpt-4o-mini)',
-            claude:'🟣 Anthropic (Claude)',
-            gemini:'🔵 Google (Gemini)',
-            custom:'⚙️ Custom endpoint'
+            free:'Free (Pollinations.ai — no key needed)',
+            openai:'OpenAI (ChatGPT — gpt-4o-mini)',
+            claude:'Anthropic (Claude)',
+            gemini:'Google (Gemini)',
+            custom:'Custom endpoint'
         };
         const provLbl = document.getElementById('setting-ai-provider-btn')?.querySelector('.csel-label');
         if (provLbl) provLbl.textContent = providerLabels[provider] || providerLabels.free;
@@ -170,11 +170,11 @@ function updateBlocklist(val) { state.settings.blocklist = val; saveDataToDB(); 
 
 // ---- AI Provider Management ----
 const AI_PROVIDER_META = {
-    free:    { hint: '✅ No API key needed. Uses Pollinations.ai — free, unlimited, but slower.', showKey: false, showBase: false },
-    openai:  { hint: '🔑 Paste your OpenAI API key (sk-...). Get one at platform.openai.com.', showKey: true, showBase: false },
-    claude:  { hint: '🔑 Paste your Anthropic API key (sk-ant-...). Get one at console.anthropic.com.', showKey: true, showBase: false },
-    gemini:  { hint: '🔑 Paste your Google AI Studio key. Get one at aistudio.google.com.', showKey: true, showBase: false },
-    custom:  { hint: '⚙️ Enter your API key and the base URL of any OpenAI-compatible endpoint (e.g. LM Studio, Groq, Together AI).', showKey: true, showBase: true },
+    free:    { hint: 'No API key needed. Uses Pollinations.ai — free, unlimited, but slower.', showKey: false, showBase: false },
+    openai:  { hint: 'Paste your OpenAI API key (sk-...). Get one at platform.openai.com.', showKey: true, showBase: false },
+    claude:  { hint: 'Paste your Anthropic API key (sk-ant-...). Get one at console.anthropic.com.', showKey: true, showBase: false },
+    gemini:  { hint: 'Paste your Google AI Studio key. Get one at aistudio.google.com.', showKey: true, showBase: false },
+    custom:  { hint: 'Enter your API key and the base URL of any OpenAI-compatible endpoint (e.g. LM Studio, Groq, Together AI).', showKey: true, showBase: true },
 };
 function updateAiProviderUI(provider) {
     const meta = AI_PROVIDER_META[provider] || AI_PROVIDER_META["free"];
@@ -397,13 +397,13 @@ function renderSessionLog() {
                         <span class="w-2 h-2 rounded-full bg-accent shrink-0"></span>
                         <div class="min-w-0">
                             <div class="text-sm font-medium text-textMain">${s.subject}</div>
-                            ${s.noteTitle ? `<div class="text-[10px] text-accent truncate">📝 ${s.noteTitle}</div>` : ''}
+                            ${s.noteTitle ? `<div class="text-[10px] text-accent truncate"> ${s.noteTitle}</div>` : ''}
                         </div>
                     </div>
                     <div class="flex items-center gap-4 shrink-0">
                         <span class="text-xs font-mono text-textMuted">${timeStr}</span>
                         <span class="text-[10px] text-textMuted">${s.date}</span>
-                        <button onclick="deleteSession('${s.id}')" class="text-textMuted hover:text-red-400 transition text-xs px-1">✕</button>
+                        <button onclick="deleteSession('${s.id}')" class="text-textMuted hover:text-red-400 transition text-xs px-1"></button>
                     </div>
                 </div>`;
             }).join('');
@@ -503,7 +503,7 @@ function renderExamCountdowns() {
         const urgency = diff <= 3 ? 'text-red-400' : diff <= 7 ? 'text-orange-400' : 'text-mint';
         const label = diff === 0 ? 'Today!' : diff === 1 ? 'Tomorrow' : `${diff} days`;
         return `<div class="glass-sidebar border ${PALETTE[i%4]} rounded-xl p-4 flex flex-col min-w-[160px] relative group">
-            <button onclick="deleteExam('${e.id}')" class="absolute top-2 right-2 text-textMuted/40 hover:text-red-400 opacity-0 group-hover:opacity-100 transition text-xs px-1">✕</button>
+            <button onclick="deleteExam('${e.id}')" class="absolute top-2 right-2 text-textMuted/40 hover:text-red-400 opacity-0 group-hover:opacity-100 transition text-xs px-1"></button>
             <div class="text-[10px] text-textMuted uppercase tracking-wider mb-1">${e.subject || 'Exam'}</div>
             <div class="text-sm font-bold text-textMain mb-1 pr-4">${e.title}</div>
             <div class="text-2xl font-light ${urgency} mt-auto">${label}</div>

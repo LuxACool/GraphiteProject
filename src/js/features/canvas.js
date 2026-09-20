@@ -258,6 +258,11 @@ function initCanvas() {
             if(['rect', 'circle', 'line', 'sticky', 'occlude'].includes(currentTool)) currentStroke.rectEnd = pos; 
         }
     });
+    canvas.addEventListener('dblclick', (e) => {
+        if (pointerLockActive || currentTool !== 'pan') return;
+        const hit = _findStickyAt(getMousePos(e));
+        if (hit) { e.preventDefault(); showStickyEditor(hit, { existing: true }); }
+    });
     canvas.addEventListener('mousemove', (e) => {
         if (pointerLockActive) {
             // Accumulate raw deltas into mock position, clamped to canvas bounds
@@ -482,120 +487,125 @@ function commitTextBox(boxId) {
     box.remove();
 }
 
-function showStickyEditor(stroke) {
-    // Place editor near where the sticky was drawn
+function showStickyEditor(stroke, options = {}) {
+    // Sticky notes are lightweight canvas objects: title + body + color.
+    // Existing notes can be opened again with a double-click.
+    const existing = !!options.existing;
     const canvasRect = canvas.getBoundingClientRect();
-    const x1 = Math.min(stroke.points[0].x, stroke.rectEnd?.x || stroke.points[0].x);
-    const y1 = Math.min(stroke.points[0].y, stroke.rectEnd?.y || stroke.points[0].y);
-    const w = Math.abs((stroke.rectEnd?.x || stroke.points[0].x) - stroke.points[0].x) || 200;
-    const h = Math.abs((stroke.rectEnd?.y || stroke.points[0].y) - stroke.points[0].y) || 120;
+    const p0 = stroke.points?.[0] || { x: 0, y: 0 };
+    const p1 = stroke.rectEnd || { x: p0.x + 220, y: p0.y + 140 };
+    const x1 = Math.min(p0.x, p1.x), y1 = Math.min(p0.y, p1.y);
+    const w = Math.max(220, Math.abs(p1.x - p0.x));
+    const h = Math.max(140, Math.abs(p1.y - p0.y));
+    stroke.points = [{ x: x1, y: y1 }];
+    stroke.rectEnd = { x: x1 + w, y: y1 + h };
 
     const screenX = x1 * camera.zoom + camera.x + canvasRect.left;
     const screenY = y1 * camera.zoom + camera.y + canvasRect.top;
-    const screenW = Math.max(160, w * camera.zoom);
-    const screenH = Math.max(100, h * camera.zoom);
+    const screenW = Math.max(240, w * camera.zoom);
+    const screenH = Math.max(170, h * camera.zoom);
+    const colors = [
+        { name:'Warm', value:'#fde68a' },
+        { name:'Blue', value:'#bfdbfe' },
+        { name:'Green', value:'#bbf7d0' },
+        { name:'Pink', value:'#fbcfe8' },
+        { name:'Lavender', value:'#ddd6fe' }
+    ];
+    const noteColor = stroke.noteColor || '#fde68a';
 
     const box = document.createElement('div');
     box.id = 'sticky-editor-' + Date.now();
-    box.style.cssText = `
-        position: fixed;
-        left: ${screenX}px;
-        top: ${screenY}px;
-        width: ${screenW}px;
-        min-height: ${screenH}px;
-        background: #fef3c7;
-        border: 2px solid #d97706;
-        border-radius: 6px;
-        box-shadow: 4px 4px 18px rgba(0,0,0,0.3);
-        z-index: 9990;
-        display: flex;
-        flex-direction: column;
-        resize: both;
-        overflow: auto;
-        font-family: Inter, sans-serif;
-    `;
+    box.className = 'sticky-editor';
+    box.style.cssText = `position:fixed;left:${screenX}px;top:${screenY}px;width:${screenW}px;min-height:${screenH}px;z-index:9990;`;
 
-    const header = document.createElement('div');
-    header.style.cssText = `
-        cursor: move;
-        padding: 4px 8px;
-        font-size: 10px;
-        font-weight: 800;
-        color: #92400e;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        background: #fde68a;
-        border-bottom: 1px solid #d97706;
-        border-radius: 5px 5px 0 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        user-select: none;
-    `;
-    const stickyBoxId = box.id;
-    header.innerHTML = `<span>Sticky Note</span><div style="display:flex;gap:6px;align-items:center">
-        <button onclick="commitStickyBox('${stickyBoxId}')" style="font-size:10px;padding:1px 7px;background:#d97706;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:700">Done</button>
-        <button onclick="document.getElementById('${stickyBoxId}').remove()" style="font-size:13px;background:none;border:none;color:#92400e;cursor:pointer;line-height:1">&times;</button>
-    </div>`;
+    const colorButtons = colors.map(c => `<button type="button" class="sticky-color" data-color="${c.value}" title="${c.name}" aria-label="${c.name}" style="background:${c.value}"></button>`).join('');
+    box.innerHTML = `
+      <div class="sticky-editor-head">
+        <div class="sticky-editor-drag"><span class="sticky-editor-dot"></span><span>${existing ? 'Edit note' : 'New note'}</span></div>
+        <div class="sticky-editor-actions">
+          ${existing ? `<button type="button" data-action="delete" class="sticky-editor-danger">Delete</button>` : ''}
+          <button type="button" data-action="cancel" class="sticky-editor-muted">Cancel</button>
+          <button type="button" data-action="save" class="sticky-editor-save">Save</button>
+        </div>
+      </div>
+      <div class="sticky-editor-body">
+        <input class="sticky-title" type="text" maxlength="80" placeholder="Title (optional)" value="${String(stroke.title || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}">
+        <textarea class="sticky-content" maxlength="1200" placeholder="Write a short note…">${String(stroke.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
+        <div class="sticky-editor-footer">
+          <div class="sticky-palette" aria-label="Note color">${colorButtons}</div>
+          <span class="sticky-count">0 / 1200</span>
+          <span class="sticky-shortcut">Ctrl/Cmd + Enter to save</span>
+        </div>
+      </div>`;
 
-    const ta = document.createElement('textarea');
-    ta.placeholder = 'Write your note...';
-    ta.style.cssText = `
-        flex: 1;
-        min-height: 70px;
-        background: transparent;
-        border: none;
-        outline: none;
-        resize: none;
-        padding: 8px 10px;
-        font-size: 14px;
-        color: #422006;
-        font-family: Inter, sans-serif;
-        line-height: 1.5;
-    `;
-
-    box.appendChild(header);
-    box.appendChild(ta);
     document.body.appendChild(box);
-    ta.focus();
+    const titleEl = box.querySelector('.sticky-title');
+    const contentEl = box.querySelector('.sticky-content');
+    const countEl = box.querySelector('.sticky-count');
+    let selectedColor = noteColor;
+    const updateCount = () => { countEl.textContent = `${contentEl.value.length} / 1200`; };
+    const paintSelection = () => box.querySelectorAll('.sticky-color').forEach(btn => btn.classList.toggle('selected', btn.dataset.color === selectedColor));
+    box.querySelectorAll('.sticky-color').forEach(btn => btn.addEventListener('click', () => { selectedColor = btn.dataset.color; paintSelection(); }));
+    paintSelection(); updateCount();
 
-    box._stroke = stroke;
-    box._ta = ta;
+    const removeBox = () => {
+        if (box._onDragMove) window.removeEventListener('mousemove', box._onDragMove);
+        if (box._onDragUp) window.removeEventListener('mouseup', box._onDragUp);
+        box.remove();
+    };
+    const save = () => {
+        const title = titleEl.value.trim();
+        const text = contentEl.value.trim();
+        if (!title && !text) { removeBox(); return; }
+        stroke.title = title;
+        stroke.text = text;
+        stroke.noteColor = selectedColor;
+        if (!existing) state.canvasStrokes.push(stroke);
+        saveDataToDB(); redrawCanvas(); removeBox();
+    };
+    const remove = () => {
+        if (existing) {
+            const idx = state.canvasStrokes.indexOf(stroke);
+            if (idx >= 0) state.canvasStrokes.splice(idx, 1);
+            saveDataToDB(); redrawCanvas();
+        }
+        removeBox();
+    };
+    box.querySelector('[data-action="save"]').addEventListener('click', save);
+    box.querySelector('[data-action="cancel"]').addEventListener('click', removeBox);
+    box.querySelector('[data-action="delete"]')?.addEventListener('click', remove);
+    contentEl.addEventListener('input', updateCount);
+    titleEl.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); save(); } });
+    contentEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); save(); }
+        if (e.key === 'Escape') { e.preventDefault(); removeBox(); }
+    });
 
-    // Dragging
-    let dragging = false, dragOffX = 0, dragOffY = 0;
-    header.addEventListener('mousedown', (e) => {
-        if (e.target.tagName === 'BUTTON') return;
+    // Drag the editor without stealing focus from its fields.
+    const dragHandle = box.querySelector('.sticky-editor-drag');
+    let dragging = false, dx = 0, dy = 0;
+    dragHandle.addEventListener('mousedown', e => {
         dragging = true;
-        dragOffX = e.clientX - box.getBoundingClientRect().left;
-        dragOffY = e.clientY - box.getBoundingClientRect().top;
+        const r = box.getBoundingClientRect();
+        dx = e.clientX - r.left; dy = e.clientY - r.top;
         e.preventDefault();
     });
-    window.addEventListener('mousemove', (e) => {
-        if (!dragging) return;
-        box.style.left = (e.clientX - dragOffX) + 'px';
-        box.style.top = (e.clientY - dragOffY) + 'px';
-    });
-    window.addEventListener('mouseup', () => { dragging = false; });
-
-    ta.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); commitStickyBox(stickyBoxId); }
-        if (e.key === 'Escape') { box.remove(); }
-    });
+    box._onDragMove = e => { if (!dragging) return; box.style.left = `${e.clientX - dx}px`; box.style.top = `${e.clientY - dy}px`; };
+    box._onDragUp = () => { dragging = false; };
+    window.addEventListener('mousemove', box._onDragMove);
+    window.addEventListener('mouseup', box._onDragUp);
+    setTimeout(() => titleEl.focus(), 0);
 }
 
-function commitStickyBox(boxId) {
-    const box = document.getElementById(boxId);
-    if (!box) return;
-    const txt = box._ta.value.trim();
-    const stroke = box._stroke;
-    if (txt && stroke) {
-        stroke.text = txt;
-        state.canvasStrokes.push(stroke);
-        saveDataToDB();
-        redrawCanvas();
+function _findStickyAt(worldPos) {
+    const strokes = state.canvasStrokes.filter(s => s.workspaceId === state.activeWorkspace && s.tool === 'sticky' && s.points?.[0] && s.rectEnd);
+    for (let i = strokes.length - 1; i >= 0; i--) {
+        const s = strokes[i];
+        const x1 = Math.min(s.points[0].x, s.rectEnd.x), x2 = Math.max(s.points[0].x, s.rectEnd.x);
+        const y1 = Math.min(s.points[0].y, s.rectEnd.y), y2 = Math.max(s.points[0].y, s.rectEnd.y);
+        if (worldPos.x >= x1 && worldPos.x <= x2 && worldPos.y >= y1 && worldPos.y <= y2) return s;
     }
-    box.remove();
+    return null;
 }
 
 function endAction() {
@@ -605,7 +615,7 @@ function endAction() {
             isDrawing = false; isPanning = false; currentStroke = null;
             canvas.style.cursor = 'crosshair';
             redrawCanvas();
-            showStickyEditor(stroke);
+            showStickyEditor(stroke, { existing: false });
             return;
         } else if (currentStroke.tool === 'occlude') {
             currentStroke.revealed = false;
@@ -906,18 +916,25 @@ function renderStroke(s) {
         const y = Math.min(s.points[0].y, s.rectEnd.y);
         const w = Math.abs(s.rectEnd.x - s.points[0].x);
         const h = Math.abs(s.rectEnd.y - s.points[0].y);
+        const palette = { '#fde68a':['#422006','#d97706'], '#bfdbfe':['#172554','#2563eb'], '#bbf7d0':['#052e16','#16a34a'], '#fbcfe8':['#500724','#db2777'], '#ddd6fe':['#2e1065','#7c3aed'] };
+        const colors = palette[s.noteColor] || palette['#fde68a'];
         ctx.save();
-        ctx.shadowColor = 'rgba(0,0,0,0.25)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3;
-        ctx.fillStyle = '#fde68a';
+        ctx.shadowColor = 'rgba(0,0,0,0.22)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+        ctx.fillStyle = s.noteColor || '#fde68a';
         ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(x, y, w, h, 6); else ctx.rect(x, y, w, h);
+        if (ctx.roundRect) ctx.roundRect(x, y, w, h, 8); else ctx.rect(x, y, w, h);
         ctx.fill();
         ctx.restore();
-        ctx.strokeStyle = '#d97706'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.strokeStyle = colors[1]; ctx.lineWidth = 1; ctx.stroke();
+        // folded corner
+        ctx.save(); ctx.fillStyle = 'rgba(255,255,255,.28)'; ctx.beginPath(); ctx.moveTo(x+w-22,y); ctx.lineTo(x+w,y+22); ctx.lineTo(x+w-22,y+22); ctx.closePath(); ctx.fill(); ctx.restore();
+        const pad = 12;
+        if (s.title) { ctx.fillStyle = colors[0]; ctx.font = '700 14px Inter, sans-serif'; wrapCanvasText(ctx, s.title, x + pad, y + 22, Math.max(40,w-pad*2), 18); }
         if (s.text) {
-            ctx.fillStyle = '#422006';
-            ctx.font = '14px sans-serif';
-            wrapCanvasText(ctx, s.text, x + 10, y + 22, w - 20, 18);
+            ctx.fillStyle = colors[0];
+            ctx.font = '13px Inter, sans-serif';
+            const bodyY = s.title ? y + 46 : y + 24;
+            wrapCanvasText(ctx, s.text, x + pad, bodyY, Math.max(40,w-pad*2), 18);
         }
     } else if (s.tool === 'fill-shape' && s.points[0] && s.rectEnd) {
         // A filled rect, circle, etc. — drawn solid

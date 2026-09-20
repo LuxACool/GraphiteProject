@@ -84,7 +84,7 @@ Return ONLY the improved note content — no preamble, no "Here is the improved 
                 if (result && result.trim()) {
                     document.getElementById('note-body-raw').value = result.trim();
                     saveNotes(); updateLivePreview(); updateWordCount();
-                    toast('✨ Note expanded by AI!', 'success');
+                    toast(' Note expanded by AI!', 'success');
                 } else {
                     toast('AI returned empty response. Try again.', 'error');
                 }
@@ -118,7 +118,7 @@ Keep it study-friendly and scannable.`;
                     const ta = document.getElementById('note-body-raw');
                     ta.value = (note.body || '').trim() + '\n\n---\n\n' + result.trim();
                     saveNotes(); updateLivePreview(); updateWordCount();
-                    toast('⚡ Summary added to note!', 'success');
+                    toast(' Summary added to note!', 'success');
                 }
             } catch (err) {
                 toast('AI error: ' + err.message, 'error');
@@ -135,7 +135,7 @@ Keep it study-friendly and scannable.`;
             try {
                 const sys = `You are a tutor. Add relevant context, real-world examples, mnemonics, or analogies to help understand the note's content. 
 Format as:
-## 🧠 AI Context & Examples
+##  AI Context & Examples
 [your additions here in markdown]
 
 Keep it practical and memorable. Do NOT repeat the existing content.`;
@@ -144,7 +144,7 @@ Keep it practical and memorable. Do NOT repeat the existing content.`;
                     const ta = document.getElementById('note-body-raw');
                     ta.value = (note.body || '').trim() + '\n\n' + result.trim();
                     saveNotes(); updateLivePreview(); updateWordCount();
-                    toast('🧠 Context & examples added!', 'success');
+                    toast(' Context & examples added!', 'success');
                 }
             } catch (err) {
                 toast('AI error: ' + err.message, 'error');
@@ -196,10 +196,10 @@ Maximum 5 connections. Only include genuinely related notes. Return [] if no goo
                 });
 
                 if (addedLinks.length > 0) {
-                    body += '\n\n## 🔗 Related Notes\n' + addedLinks.map(t => `- [[${t}]]`).join('\n');
+                    body += '\n\n##  Related Notes\n' + addedLinks.map(t => `- [[${t}]]`).join('\n');
                     ta.value = body;
                     saveNotes(); updateLivePreview();
-                    toast(`🔗 Linked to ${addedLinks.length} related notes!`, 'success');
+                    toast(` Linked to ${addedLinks.length} related notes!`, 'success');
                 } else {
                     toast('These notes are already linked.', 'info');
                 }
@@ -246,7 +246,7 @@ Return ONLY the new note content in markdown, starting with the # Title.`;
                         saveNotes();
                     }
                     saveDataToDB(); renderNotesList(); updateLivePreview();
-                    toast(`✨ New note "${newTitle}" created!`, 'success');
+                    toast(` New note "${newTitle}" created!`, 'success');
                 }
             } catch (err) {
                 toast('AI error: ' + err.message, 'error');
@@ -344,7 +344,7 @@ Format your response in clean markdown with these exact section headers. Be spec
                 if (area) area.innerHTML = `<div class="text-red-400 text-sm text-center py-6">Error: ${err.message}</div>`;
             } finally {
                 if (btn) btn.textContent = 'Run Synthesis';
-                if (icon) icon.textContent = '✦';
+                if (icon) icon.textContent = '';
             }
         }
 
@@ -377,8 +377,8 @@ Maximum 8 pairs. Focus on the most meaningful semantic connections. Return [] if
                 if (added > 0) {
                     saveDataToDB();
                     if (state.currentNoteId) { updateLivePreview(); }
-                    if (area) area.innerHTML = `<div class="text-center py-6"><div class="text-3xl mb-3">🔗</div><p class="text-sm text-textMain font-semibold">${added} new connections added to your notes!</p><p class="text-xs text-textMuted mt-2">Run Synthesis again to see the updated knowledge map.</p></div>`;
-                    toast(`🔗 Added ${added} note connections!`, 'success');
+                    if (area) area.innerHTML = `<div class="text-center py-6"><div class="text-3xl mb-3"></div><p class="text-sm text-textMain font-semibold">${added} new connections added to your notes!</p><p class="text-xs text-textMuted mt-2">Run Synthesis again to see the updated knowledge map.</p></div>`;
+                    toast(` Added ${added} note connections!`, 'success');
                 } else {
                     if (area) area.innerHTML = '<div class="text-center py-6 text-textMuted text-sm">All relevant notes are already connected, or no clear connections found.</div>';
                 }
@@ -396,7 +396,7 @@ Maximum 8 pairs. Focus on the most meaningful semantic connections. Return [] if
                 const noteContent = wsNotes.slice(0, 15).map(n => `# ${n.title}\n${(n.body || '').slice(0, 400)}`).join('\n\n---\n\n');
                 const sys = `You are a study assistant. Create a comprehensive master summary note for a student's entire workspace.
 Format as proper markdown:
-# 📚 Workspace Summary — [detect the main topic]
+#  Workspace Summary — [detect the main topic]
 ## Overview
 [2-3 sentences describing what this workspace covers]
 ## Core Themes
@@ -412,7 +412,7 @@ Start with the # header. Reference actual note titles using [[double brackets]].
                 if (result && result.trim()) {
                     const lines = result.trim().split('\n');
                     const titleLine = lines.find(l => l.startsWith('# '));
-                    const newTitle = titleLine ? titleLine.replace('# ', '').trim() : '📚 Workspace Summary';
+                    const newTitle = titleLine ? titleLine.replace('# ', '').trim() : ' Workspace Summary';
                     const newBody = result.trim();
                     const summaryNote = {
                         id: 'summary-' + Date.now(),
@@ -424,8 +424,8 @@ Start with the # header. Reference actual note titles using [[double brackets]].
                     };
                     state.notes.unshift(summaryNote);
                     saveDataToDB(); renderNotesList();
-                    if (area) area.innerHTML = `<div class="text-center py-6"><div class="text-3xl mb-3">📝</div><p class="text-sm text-textMain font-semibold">Master summary note created!</p><p class="text-xs text-textMuted mt-2">Find "${newTitle}" at the top of your notes list.</p></div>`;
-                    toast('📝 Summary note created!', 'success');
+                    if (area) area.innerHTML = `<div class="text-center py-6"><div class="text-3xl mb-3"></div><p class="text-sm text-textMain font-semibold">Master summary note created!</p><p class="text-xs text-textMuted mt-2">Find "${newTitle}" at the top of your notes list.</p></div>`;
+                    toast(' Summary note created!', 'success');
                 }
             } catch (err) {
                 if (area) area.innerHTML = `<div class="text-red-400 text-sm text-center py-6">Error: ${err.message}</div>`;

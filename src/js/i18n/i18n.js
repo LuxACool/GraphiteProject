@@ -120,7 +120,7 @@
       btn.classList.toggle('is-active', active);
       btn.setAttribute('aria-selected', String(active));
       const check = btn.querySelector('[data-language-check]');
-      if (check) check.textContent = active ? '✓' : '';
+      if (check) check.textContent = active ? '' : '';
     });
   }
 

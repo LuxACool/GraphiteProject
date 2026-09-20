@@ -32,7 +32,7 @@ function submitManualCard() {
     const isMCQ = document.getElementById('act-type').value === 'mcq';
     let card = { id: Date.now().toString(), q, a, rep: 0, int: 1, ef: 2.5, next: Date.now(), workspaceId: state.activeWorkspace };
     if (isMCQ) {
-        const opts = document.getElementById('act-options').value.split(',').map(o => o.trim()).filter(Boolean);
+        const opts = document.getElementById('act-options').value.split(/[,\n]/).map(o => o.trim()).filter(Boolean);
         if (opts.length >= 2) { card.type = 'mcq'; card.options = opts; const match = opts.find(o => o.toLowerCase() === a.toLowerCase()); if (match) card.a = match; }
     }
     state.flashcards.push(card);
@@ -64,14 +64,14 @@ async function submitAIGenerate() {
     resultEl.classList.add('hidden');
     try {
         await tutorGenerateCards();
-        resultEl.textContent = '✓ Cards generated and added to your deck!';
+        resultEl.textContent = ' Cards generated and added to your deck!';
         resultEl.classList.remove('hidden');
         setTimeout(closeAddCardModal, 1400);
     } catch(e) {
-        resultEl.textContent = '✗ Generation failed. Try again.';
+        resultEl.textContent = ' Generation failed. Try again.';
         resultEl.classList.remove('hidden');
     }
-    btn.disabled = false; icon.textContent = '✦';
+    btn.disabled = false; icon.textContent = '';
 }
 
 let srsBatchLimit = 10; // default 10 questions per session
@@ -127,7 +127,7 @@ function _renderFCCard() {
 
     if (srsDeck.length === 0) {
         currentCard = null;
-        frontEl.innerHTML = "No cards due. You're all caught up! 🎉";
+        frontEl.innerHTML = "You're all caught up — no cards need review right now.";
         if (navStatus) navStatus.textContent = '0 / 0';
         { const pb = document.getElementById('fc-progress-bar'); if (pb) pb.style.width = '0%'; }
         if (hintEl) hintEl.textContent = '';
@@ -159,7 +159,7 @@ function _renderFCCard() {
         document.getElementById('fc-back-content').innerHTML = '';
     } else {
         // Basic flashcard
-        if (hintEl) hintEl.textContent = 'Click card to flip';
+        if (hintEl) hintEl.textContent = 'Select the card to reveal the answer';
         document.getElementById('flashcard-container').onclick = flipCard;
         frontEl.innerHTML = renderMarkdownWithMath(currentCard.q);
         renderMathInElement(frontEl, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false });
@@ -232,7 +232,7 @@ function fcPrevCard() {
 function renderCardMeta(card){
     const ef = (card.ef || 2.5).toFixed(2);
     const rep = card.rep || 0;
-    const leech = card.leech ? '<span class="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30" title="Leech: marked wrong 5+ times this week">🪤 Leech</span>' : '';
+    const leech = card.leech ? '<span class="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30" title="Leech: marked wrong 5+ times this week">Leech</span>' : '';
     // Color EF: red < 1.8, orange < 2.2, mint >= 2.2
     const efNum = parseFloat(ef);
     const efColor = efNum < 1.8 ? 'text-red-400' : efNum < 2.2 ? 'text-orange-400' : 'text-mint';
@@ -282,7 +282,7 @@ function gradeCard(quality) {
 
 function flagLeech(card){
     card.leech = true;
-    toast('🪤 Leech detected: "' + (card.q || '').slice(0, 40) + '" — sent to AI Tutor for a breakdown.', 'error');
+    toast('Leech detected: "' + (card.q || '').slice(0, 40) + '" — sent to AI Tutor for a breakdown.', 'error');
     // Auto-prompt AI Tutor to break it down with a simpler analogy.
     try {
         state.tutorChat = state.tutorChat || [];

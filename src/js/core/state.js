@@ -17,7 +17,7 @@ let state = {
     settings: { 
         theme: 'dark', accent: '#3B82F6',
         wallpaper: '', glassOpacity: 0.82, glassBlur: 18, ambientSound: 'none',
-        blocklist: 'dont use this feature. Does not work lol',
+        blocklist: 'This feature is currently unavailable.',
         focusAwareEnabled: true, preset: 'graphiteblue',
         openaiKey: '', openaiBase: '', aiProvider: 'free',
         hoverDrawKey: 'f'
@@ -89,7 +89,7 @@ function loadDataFromDB() {
             state.settings = {
                 theme: 'dark', accent: '#3B82F6', wallpaper: '',
                 glassOpacity: 0.82, glassBlur: 18, ambientSound: 'none',
-                blocklist: 'dont use this feature. Does not work lol',
+                blocklist: 'This feature is currently unavailable.',
                 focusAwareEnabled: true, preset: 'graphiteblue',
                 openaiKey: '', openaiBase: '', aiProvider: 'free', hoverDrawKey: 'f'
             };
@@ -103,7 +103,7 @@ function loadDataFromDB() {
                     glassOpacity: 0.82,
                     glassBlur: 18,
                     ambientSound: 'none',
-                    blocklist: 'dont use this feature. Does not work lol',
+                    blocklist: 'This feature is currently unavailable.',
                     focusAwareEnabled: true,
                     preset: 'graphiteblue',
                     openaiKey: '',

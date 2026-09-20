@@ -212,10 +212,10 @@
         <div class="glass-sidebar border border-borderDark rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[85vh] overflow-hidden">
             <div class="p-5 border-b border-borderDark flex items-center justify-between shrink-0">
                 <div>
-                    <h3 class="text-lg font-bold text-textMain flex items-center gap-2">✦ AI Knowledge Synthesis</h3>
+                    <h3 class="text-lg font-bold text-textMain flex items-center gap-2"> AI Knowledge Synthesis</h3>
                     <p class="text-xs text-textMuted mt-0.5">AI analyzes your notes, scores connections, and reveals knowledge gaps.</p>
                 </div>
-                <button onclick="closeAISynthesisPanel()" class="text-textMuted hover:text-textMain text-xl px-2 transition">✕</button>
+                <button onclick="closeAISynthesisPanel()" class="text-textMuted hover:text-textMain text-xl px-2 transition"></button>
             </div>
             <!-- Stats Row -->
             <div class="grid grid-cols-3 gap-3 p-4 border-b border-borderDark shrink-0" id="synthesis-stats-row">
@@ -236,7 +236,7 @@
             <div class="flex-1 overflow-y-auto p-5">
                 <div id="synthesis-result-area">
                     <div class="text-center py-10 text-textMuted">
-                        <div class="text-4xl mb-3">✦</div>
+                        <div class="text-4xl mb-3"></div>
                         <p class="text-sm">Click <strong>Run Synthesis</strong> to let AI analyze your knowledge base and surface insights, connections, and gaps.</p>
                     </div>
                 </div>
@@ -244,11 +244,11 @@
             <!-- Actions -->
             <div class="p-4 border-t border-borderDark flex gap-3 shrink-0 flex-wrap">
                 <button onclick="runAISynthesis()" class="px-5 py-2.5 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition text-sm flex items-center gap-2">
-                    <span id="synthesis-btn-icon">✦</span>
+                    <span id="synthesis-btn-icon"></span>
                     <span id="synthesis-btn-text">Run Synthesis</span>
                 </button>
-                <button onclick="aiAutoLinkNotes()" class="px-4 py-2.5 bg-mint/20 border border-mint/30 text-mint font-semibold rounded-xl hover:bg-mint/30 transition text-sm">🔗 Auto-Link Notes</button>
-                <button onclick="aiGenerateSummaryNote()" class="px-4 py-2.5 bg-bgDark border border-borderDark text-textMain font-medium rounded-xl hover:bg-black/20 transition text-sm">📝 Create Summary Note</button>
+                <button onclick="aiAutoLinkNotes()" class="px-4 py-2.5 bg-mint/20 border border-mint/30 text-mint font-semibold rounded-xl hover:bg-mint/30 transition text-sm"> Auto-Link Notes</button>
+                <button onclick="aiGenerateSummaryNote()" class="px-4 py-2.5 bg-bgDark border border-borderDark text-textMain font-medium rounded-xl hover:bg-black/20 transition text-sm"> Create Summary Note</button>
                 <button onclick="closeAISynthesisPanel()" class="ml-auto px-4 py-2.5 text-textMuted hover:text-textMain text-sm transition">Close</button>
             </div>
         </div>
@@ -270,7 +270,7 @@
     <div id="cmd-palette" class="fixed inset-0 z-[9999] hidden flex items-start justify-center pt-[10vh] md:pt-[15vh] bg-black/60 backdrop-blur-sm px-4">
         <div class="glass-sidebar border border-borderDark rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-4 border-b border-borderDark flex items-center gap-3">
-                <span class="text-textMuted text-lg">🔎</span>
+                <span class="text-textMuted text-lg"></span>
                 <input type="text" id="cmd-input" placeholder="Search commands, apps, notes..." class="w-full bg-transparent text-textMain outline-none text-base placeholder:text-textMuted" autocomplete="off"/>
             </div>
             <div id="cmd-results" class="flex-1 overflow-y-auto p-2"></div>
@@ -304,8 +304,8 @@
             </div>
             <!-- Tab switcher -->
             <div class="flex p-0.5 glass-bg border border-borderDark rounded-lg mb-5 shrink-0">
-                <button id="act-tab-manual" onclick="switchAddCardTab('manual')" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition bg-accent text-white">✏️ Manual</button>
-                <button id="act-tab-ai" onclick="switchAddCardTab('ai')" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition text-textMuted">✦ AI Generate</button>
+                <button id="act-tab-manual" onclick="switchAddCardTab('manual')" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition bg-accent text-white"> Manual</button>
+                <button id="act-tab-ai" onclick="switchAddCardTab('ai')" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition text-textMuted"> AI Generate</button>
             </div>
 
             <!-- Manual tab -->
@@ -364,7 +364,7 @@
                 <div id="act-ai-result" class="hidden text-xs text-mint font-semibold text-center py-1"></div>
                 <div class="flex justify-end gap-3 pt-2 border-t border-borderDark/50 shrink-0">
                     <button onclick="closeAddCardModal()" class="px-5 py-2 rounded-lg text-sm font-medium text-textMuted hover:text-textMain hover:bg-black/20 transition">Cancel</button>
-                    <button onclick="submitAIGenerate()" id="act-ai-btn" class="px-5 py-2 rounded-lg text-sm font-bold bg-accent text-white hover:opacity-90 transition flex items-center gap-2"><span id="act-ai-icon">✦</span> Generate</button>
+                    <button onclick="submitAIGenerate()" id="act-ai-btn" class="px-5 py-2 rounded-lg text-sm font-bold bg-accent text-white hover:opacity-90 transition flex items-center gap-2"><span id="act-ai-icon"></span> Generate</button>
                 </div>
             </div>
         </div>

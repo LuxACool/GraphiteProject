@@ -16,7 +16,7 @@ function renderWorkspaceDropdown() {
                 <div class="w-3 h-3 rounded-full" style="background-color: ${w.color}"></div>
                 <span class="text-sm ${w.id === state.activeWorkspace ? 'text-accent font-bold' : 'text-textMuted group-hover:text-textMain'}">${w.name}</span>
             </div>
-            ${state.workspaces.length > 1 ? `<button onclick="deleteWorkspace(event, '${w.id}')" class="text-red-400 opacity-0 group-hover:opacity-100 text-sm font-bold px-2 py-1 rounded hover:bg-red-400/20">✕</button>` : ''}
+            ${state.workspaces.length > 1 ? `<button onclick="deleteWorkspace(event, '${w.id}')" class="text-red-400 opacity-0 group-hover:opacity-100 text-sm font-bold px-2 py-1 rounded hover:bg-red-400/20"></button>` : ''}
         </div>
     `).join('');
 }

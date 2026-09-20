@@ -19,7 +19,7 @@ function renderKanban() {
                     <span class="font-medium text-textMain text-base md:text-sm">${task.title}</span>
                     <div class="flex gap-1 shrink-0">
                         <button onclick="moveTaskMobile('${task.id}', '${col}')" class="kb-move-btn md:hidden text-textMuted hover:text-accent transition text-xl px-2 opacity-100">↔</button>
-                        <button onclick="deleteTask('${task.id}', '${col}')" class="text-textMuted hover:text-red-400 transition text-xl md:text-sm px-2 md:px-0 opacity-100 md:opacity-0 md:group-hover:opacity-100">✕</button>
+                        <button onclick="deleteTask('${task.id}', '${col}')" class="text-textMuted hover:text-red-400 transition text-xl md:text-sm px-2 md:px-0 opacity-100 md:opacity-0 md:group-hover:opacity-100"></button>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 mt-auto pt-2 border-t border-borderDark/50">

@@ -21,7 +21,7 @@
         <div class="settings-nav-section">
           <div class="settings-nav-heading">Intelligence &amp; Data</div>
           <div class="settings-nav-list">
-            <button type="button" data-settings-tab="ai" data-settings-label="AI Tutor" class="settings-tab-btn"><span class="settings-row-icon">✦</span><span>AI Tutor</span><span class="settings-chevron">›</span></button>
+            <button type="button" data-settings-tab="ai" data-settings-label="AI Tutor" class="settings-tab-btn"><span class="settings-row-icon"></span><span>AI Tutor</span><span class="settings-chevron">›</span></button>
             <button type="button" data-settings-tab="data" data-settings-label="Data" class="settings-tab-btn"><span class="settings-row-icon">•</span><span>Data</span><span class="settings-chevron">›</span></button>
           </div>
         </div>
@@ -29,7 +29,7 @@
           <div class="settings-nav-heading">Help &amp; Info</div>
           <div class="settings-nav-list">
             <button type="button" data-settings-tab="shortcuts" data-settings-label="Shortcuts" class="settings-tab-btn"><span class="settings-row-icon">•</span><span>Shortcuts</span><span class="settings-chevron">›</span></button>
-            <button type="button" data-settings-tab="about" data-settings-label="About" class="settings-tab-btn"><span class="settings-row-icon">♡</span><span>About</span><span class="settings-chevron">›</span></button>
+            <button type="button" data-settings-tab="about" data-settings-label="About" class="settings-tab-btn"><span class="settings-row-icon"></span><span>About</span><span class="settings-chevron">›</span></button>
           </div>
         </div>
       </nav>
@@ -74,9 +74,9 @@
                                     <input type="text" id="wp-url" onchange="updateWallpaperUrl(this.value)" placeholder="https://... (URL)" class="w-full bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent">
                                     <div class="flex items-center gap-3 flex-wrap">
                                         <span class="text-[10px] text-textMuted">or</span>
-                                        <button onclick="document.getElementById('wp-local-file').click()" class="px-3 py-1.5 bg-accent/10 text-accent border border-accent/20 rounded-lg text-xs font-semibold hover:bg-accent/20 transition">📁 Upload Local File</button>
+                                        <button onclick="document.getElementById('wp-local-file').click()" class="px-3 py-1.5 bg-accent/10 text-accent border border-accent/20 rounded-lg text-xs font-semibold hover:bg-accent/20 transition">Upload local file</button>
                                         <input type="file" id="wp-local-file" accept="image/*,video/mp4,video/webm" class="hidden" onchange="loadLocalWallpaper(event)">
-                                        <button onclick="clearWallpaper()" class="text-xs text-textMuted hover:text-red-400 transition">✕ Clear</button>
+                                        <button onclick="clearWallpaper()" class="text-xs text-textMuted hover:text-red-400 transition"> Clear</button>
                                     </div>
                                     <div id="wp-current-label" class="text-[10px] text-textMuted italic"></div>
                                 </div>
@@ -208,7 +208,7 @@
                     </div>
                     <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
                         <h3 class="text-sm font-semibold text-textMain mb-1">Whiteboard Hover-Draw Hotkey</h3>
-                        <p class="text-xs text-textMuted mb-3">Hold this key on the whiteboard with the ✏️ Draw tool to draw freely — no click-and-drag needed.</p>
+                        <p class="text-xs text-textMuted mb-3">Hold this key on the whiteboard with the Draw tool to draw freely — no click-and-drag needed.</p>
                         <div class="flex items-center gap-3 flex-wrap">
                             <input type="text" id="setting-hover-draw-key" maxlength="1" placeholder="f" oninput="updateHoverDrawKey(this.value)" class="w-16 text-center bg-bgDark border border-borderDark rounded-lg px-3 py-2 text-sm text-textMain outline-none focus:border-accent font-mono uppercase" />
                             <span class="text-xs text-textMuted">Single character key (e.g. <kbd>F</kbd>, <kbd>H</kbd>, <kbd>Q</kbd>)</span>
@@ -225,21 +225,21 @@
                         <div class="csel w-full mb-3" onclick="event.stopPropagation()">
                             <select id="setting-ai-provider" class="hidden" onchange="updateAiProvider(this.value)">
                                 <option value="free">Free (Pollinations.ai — no key needed)</option>
-                                <option value="openai">🤖 OpenAI (ChatGPT — gpt-4o-mini)</option>
-                                <option value="claude">🟣 Anthropic (Claude — claude-haiku-4-5-20251001)</option>
-                                <option value="gemini">🔵 Google (Gemini — gemini-1.5-flash)</option>
-                                <option value="custom">⚙️ Custom (OpenAI-compatible endpoint)</option>
+                                <option value="openai">OpenAI (ChatGPT — gpt-4o-mini)</option>
+                                <option value="claude">Anthropic (Claude — claude-haiku-4-5-20251001)</option>
+                                <option value="gemini">Google (Gemini — gemini-1.5-flash)</option>
+                                <option value="custom">Custom (OpenAI-compatible endpoint)</option>
                             </select>
                             <button id="setting-ai-provider-btn" class="csel-btn lg w-full" onclick="cselToggle('setting-ai-provider',event)">
-                                <span class="csel-label">🆓 Free (Pollinations.ai — no key needed)</span>
+                                <span class="csel-label">Free (Pollinations.ai — no key needed)</span>
                                 <svg class="csel-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>
                             </button>
                             <div id="setting-ai-provider-dd" class="csel-dropdown">
-                                <div class="csel-option selected" data-val="free"   onclick="cselChoose('setting-ai-provider','free','🆓 Free (Pollinations.ai — no key needed)')">🆓 Free (Pollinations.ai — no key needed)</div>
-                                <div class="csel-option"          data-val="openai" onclick="cselChoose('setting-ai-provider','openai','🤖 OpenAI (ChatGPT — gpt-4o-mini)')">🤖 OpenAI (ChatGPT — gpt-4o-mini)</div>
-                                <div class="csel-option"          data-val="claude" onclick="cselChoose('setting-ai-provider','claude','🟣 Anthropic (Claude — claude-haiku-4-5-20251001)')">🟣 Anthropic (Claude)</div>
-                                <div class="csel-option"          data-val="gemini" onclick="cselChoose('setting-ai-provider','gemini','🔵 Google (Gemini — gemini-1.5-flash)')">🔵 Google (Gemini)</div>
-                                <div class="csel-option"          data-val="custom" onclick="cselChoose('setting-ai-provider','custom','⚙️ Custom (OpenAI-compatible endpoint)')">⚙️ Custom endpoint</div>
+                                <div class="csel-option selected" data-val="free"   onclick="cselChoose('setting-ai-provider','free','Free (Pollinations.ai — no key needed)')">Free (Pollinations.ai — no key needed)</div>
+                                <div class="csel-option"          data-val="openai" onclick="cselChoose('setting-ai-provider','openai','OpenAI (ChatGPT — gpt-4o-mini)')">OpenAI (ChatGPT — gpt-4o-mini)</div>
+                                <div class="csel-option"          data-val="claude" onclick="cselChoose('setting-ai-provider','claude','Anthropic (Claude — claude-haiku-4-5-20251001)')">Anthropic (Claude)</div>
+                                <div class="csel-option"          data-val="gemini" onclick="cselChoose('setting-ai-provider','gemini','Google (Gemini — gemini-1.5-flash)')">Google (Gemini)</div>
+                                <div class="csel-option"          data-val="custom" onclick="cselChoose('setting-ai-provider','custom','Custom (OpenAI-compatible endpoint)')">Custom endpoint</div>
                             </div>
                         </div>
                         <div id="ai-key-block" class="space-y-2">
@@ -265,7 +265,7 @@
                         </div>
                     </div>
                     <div class="border border-red-500/30 rounded-xl p-5 shadow-sm bg-red-500/5">
-                        <h3 class="text-sm font-semibold text-red-400 mb-1">⚠ Danger Zone</h3>
+                        <h3 class="text-sm font-semibold text-red-400 mb-1">Danger zone</h3>
                         <p class="text-xs text-textMuted mb-4">Permanently delete all data. This cannot be undone.</p>
                         <button onclick="hardReset()" class="px-4 py-2 bg-red-500/10 text-red-400 font-semibold border border-red-500/30 rounded-lg hover:bg-red-500/20 hover:border-red-400 transition text-sm">Wipe All Data</button>
                     </div>
@@ -276,7 +276,7 @@
                     <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
                         <h3 class="text-sm font-semibold text-textMain mb-1">Keyboard Shortcuts</h3>
                         <p class="text-xs text-textMuted" style="text-align: left; margin-bottom: 16px;">Press <kbd class="font-mono">?</kbd> anywhere to show the overlay.</p>
-                        <p class="text-xs text-textMuted" style="text-align: right; margin-bottom: 4px;">You can't change the keys lol</p>
+                        <p class="text-xs text-textMuted" style="text-align: right; margin-bottom: 4px;">Keyboard shortcuts are fixed for now.</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                             <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">Open Command Palette</span><kbd class="text-accent font-mono">Ctrl+K</kbd></div>
                             <div class="flex justify-between p-2.5 glass-bg rounded border border-borderDark"><span class="text-textMuted">New Note</span><kbd class="text-accent font-mono">Alt+N</kbd></div>
@@ -312,7 +312,7 @@
                     <div class="glass-sidebar border border-borderDark rounded-xl p-8 shadow-sm flex flex-col items-center text-center gap-4">
                         <div>
                             <h2 class="text-xl font-bold text-textMain mb-1">Graphite</h2>
-                            <p class="text-xs text-textMuted">pretty cool study app</p>
+                            <p class="text-xs text-textMuted">A focused workspace for studying and getting things done.</p>
                         </div>
                         <div class="w-12 border-t border-borderDark"></div>
                         <div class="space-y-1">
@@ -332,7 +332,7 @@
                 <div data-settings-panel="notifications" class="settings-panel space-y-5 hidden">
                     <div class="glass-sidebar border border-borderDark rounded-xl p-5 shadow-sm">
                         <h3 class="text-sm font-semibold text-textMain mb-1">Notification Preferences</h3>
-                        <p class="text-xs text-textMuted mb-2">I don't even know if this stupid feature works, f#ck around and find out i guess</p>
+                        <p class="text-xs text-textMuted mb-2">Choose which reminders you want Graphite to send and when they should appear.</p>
                         <div id="notif-prefs-body"><!-- rendered by NotifSystem.renderPanel() --></div>
                     </div>
                 </div>

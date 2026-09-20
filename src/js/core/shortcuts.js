@@ -10,16 +10,16 @@ function toggleCmdPalette() {
 function updateCmdResults() {
     const q = cmdInput.value.toLowerCase();
     const actions = [
-        { title: 'Go to Dashboard', icon: '📊', action: () => switchApp('dashboard') },
-        { title: 'Go to Notes', icon: '📝', action: () => switchApp('notes') },
-        { title: 'Go to Tasks', icon: '📋', action: () => switchApp('kanban') },
-        { title: 'Go to Focus Timer', icon: '⏱️', action: () => switchApp('pomodoro') },
-        { title: 'Go to Knowledge Graph', icon: '🕸️', action: () => switchApp('graph') },
-        { title: 'Go to Calendar', icon: '📅', action: () => switchApp('calendar') },
-        { title: 'Go to Settings', icon: '⚙️', action: () => switchApp('settings') },
-        { title: 'Create New Note', icon: '✨', action: () => { switchApp('notes'); createNewNote(); } }
+        { title: 'Go to Dashboard', icon: '', action: () => switchApp('dashboard') },
+        { title: 'Go to Notes', icon: '', action: () => switchApp('notes') },
+        { title: 'Go to Tasks', icon: '', action: () => switchApp('kanban') },
+        { title: 'Go to Focus Timer', icon: '⏱', action: () => switchApp('pomodoro') },
+        { title: 'Go to Knowledge Graph', icon: '', action: () => switchApp('graph') },
+        { title: 'Go to Calendar', icon: '', action: () => switchApp('calendar') },
+        { title: 'Go to Settings', icon: '', action: () => switchApp('settings') },
+        { title: 'Create New Note', icon: '', action: () => { switchApp('notes'); createNewNote(); } }
     ];
-    state.notes.filter(n => n.workspaceId === state.activeWorkspace).forEach(n => actions.push({ title: `Open Note: ${n.title || 'Untitled'}`, icon: '📄', action: () => { switchApp('notes'); loadNoteIntoEditor(n.id); } }));
+    state.notes.filter(n => n.workspaceId === state.activeWorkspace).forEach(n => actions.push({ title: `Open Note: ${n.title || 'Untitled'}`, icon: '', action: () => { switchApp('notes'); loadNoteIntoEditor(n.id); } }));
     cmdOptions = actions.filter(a => a.title.toLowerCase().includes(q)).slice(0, 8); cmdActiveIndex = 0; renderCmdList();
 }
 
@@ -35,7 +35,7 @@ function executeCmd(index) { if(cmdOptions[index]) { cmdOptions[index].action();
 // FEATURE: Keyboard Suite & Indentation
 window.addEventListener('keydown', (e) => {
     // Check canvas spacebar logic
-    if (e.code === 'Space' && !['INPUT','TEXTAREA'].includes(e.target.tagName)) { spaceHeld = true; if(canvas) canvas.style.cursor = 'grab'; e.preventDefault(); return; }
+    if (e.code === 'Space' && !['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) { spaceHeld = true; if(canvas) canvas.style.cursor = 'grab'; e.preventDefault(); return; }
 
     // Hover-draw hotkey: activate hands-free drawing when on whiteboard
     if (currentApp === 'canvas' && canvas && !['INPUT','TEXTAREA'].includes(e.target.tagName)) {
