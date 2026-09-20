@@ -1,38 +1,6 @@
-name: Release Graphite
-
-on:
-  push:
-    tags:
-      - "v*.*.*"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
-jobs:
-  release:
-    name: Build ${{ matrix.platform }}
-    runs-on: ${{ matrix.platform }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # Windows x64
-          - platform: windows-latest
-            args: ""
-
-          # macOS Apple Silicon
-          - platform: macos-latest
-            args: "--target aarch64-apple-darwin"
-
-          # macOS Intel
-          - platform: macos-latest
-            args: "--target x86_64-apple-darwin"
-
-          # Debian / Ubuntu x64
-          - platform: ubuntu-22.04
-            args: ""
+  android:
+    name: Build Android
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -43,51 +11,47 @@ jobs:
         with:
           node-version: lts/*
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: "./src-tauri -> target"
-
-      - name: Install Linux dependencies
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libappindicator3-dev \
-            librsvg2-dev \
-            patchelf \
-            xdg-utils
 
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Build and release
-        uses: tauri-apps/tauri-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Initialize Android project
+        run: |
+          if [ ! -d "src-tauri/gen/android" ]; then
+            npm run tauri android init
+          fi
+
+      - name: Build Android APK
+        run: npm run tauri android build -- --apk
+
+      - name: Build Android AAB
+        run: npm run tauri android build -- --aab
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
         with:
-          tagName: v__VERSION__
-          releaseName: Graphite v__VERSION__
-          releaseBody: |
-            # Graphite v__VERSION__
+          name: Graphite-Android-APK
+          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
 
-            Graphite desktop release.
-
-            Available platforms:
-            - Windows
-            - macOS Apple Silicon
-            - macOS Intel
-            - Debian / Ubuntu
-
-            Mobile builds will be added in a future release pipeline.
-          releaseDraft: false
-          prerelease: false
-          args: ${{ matrix.args }}
-          uploadUpdaterJson: false
-          uploadUpdaterSignatures: false
+      - name: Upload Android AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: Graphite-Android-AAB
+          path: src-tauri/gen/android/app/build/outputs/bundle/**/*.aab
+          if-no-files-found: error
